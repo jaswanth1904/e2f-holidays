@@ -1,0 +1,63 @@
+@import url('https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Inter:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+@import "tailwindcss";
+
+/* Force manual dark mode selector strategy */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-brand-blue: #30638E;
+  --color-brand-teal: #00798C;
+  --color-brand-red: #D1495B;
+  --color-brand-yellow: #EDAE49;
+  --color-brand-dark: #003D5B;
+  --color-charcoal-900: #1A1A1A;
+  --font-sans: "Plus Jakarta Sans", "Inter", sans-serif;
+  --font-display: "DM Sans", sans-serif;
+  --font-script: "Abril Fatface", serif;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    font-family: var(--font-sans);
+  }
+
+  /* High Contrast Dark Mode */
+  .dark body {
+    background-color: #000000;
+    /* Pure Black */
+    color: #ffffff;
+    /* Pure White */
+  }
+
+  /* Ensure inputs and other elements have high contrast in dark mode */
+  .dark input,
+  .dark textarea,
+  .dark select {
+    background-color: #1a1a1a;
+    border-color: #333;
+    color: #fff;
+  }
+}
+
+.font-script {
+  font-family: var(--font-script);
+  font-weight: 500;
+  /* Ensure it's legible */
+}
+
+
+
+@keyframes scroll {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-scroll {
+  animation: scroll 40s linear infinite;
+}
