@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const heroImages = [
+export const heroImages = [
     "https://images.pexels.com/photos/5138790/pexels-photo-5138790.jpeg?auto=compress&cs=tinysrgb&w=1920&q=75", // India Gate / Monument
     "https://images.pexels.com/photos/1646870/pexels-photo-1646870.jpeg?auto=compress&cs=tinysrgb&w=1920&q=75", // Taj Mahal
     "https://images.pexels.com/photos/774282/pexels-photo-774282.jpeg?auto=compress&cs=tinysrgb&w=1920&q=75", // Beach
@@ -49,9 +49,18 @@ const Typewriter = ({ words, typeSpeed = 100, deleteSpeed = 50, delay = 1500 }) 
     }, [subIndex, index, reverse, words, typeSpeed, deleteSpeed, delay]);
 
     return (
-        <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF9933] via-[#FFFFFF] to-[#138808]">
-            {words[index].substring(0, subIndex)}
-            <span className={`text-[#ffffff] ml-1 ${blink ? "opacity-100" : "opacity-0"}`}>|</span>
+        <span className="inline-grid place-items-center">
+            {/* Ghost text to reserve space */}
+            {words.map((word, i) => (
+                <span key={i} className="col-start-1 row-start-1 invisible opacity-0 pointer-events-none select-none" aria-hidden="true">
+                    {word}|
+                </span>
+            ))}
+
+            <span className="col-start-1 row-start-1 text-transparent bg-clip-text bg-gradient-to-r from-[#FF9933] via-[#FFFFFF] to-[#138808] text-center">
+                {words[index].substring(0, subIndex)}
+                <span className={`text-[#ffffff] ml-1 ${blink ? "opacity-100" : "opacity-0"}`}>|</span>
+            </span>
         </span>
     );
 };
@@ -71,17 +80,20 @@ const Hero = () => {
 
             {/* Auto Carousel Background */}
             <div className="absolute inset-0 w-full h-full">
-                <AnimatePresence mode="wait">
+                <AnimatePresence mode="sync">
                     <motion.div
                         key={currentImage}
-                        initial={{ opacity: 0, scale: 1.1 }}
-                        animate={{ opacity: 1, scale: 1 }}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        transition={{ duration: 1.5 }}
+                        transition={{ duration: 1.0 }}
                         className="absolute inset-0 w-full h-full"
                     >
                         <img
                             src={heroImages[currentImage]}
+                            width="1920"
+                            height="1080"
+                            fetchpriority="high"
                             className="absolute inset-0 w-full h-full object-cover"
                             alt="India Tourism Destinations"
                         />
@@ -95,17 +107,17 @@ const Hero = () => {
 
                 {/* Main Headline */}
                 <motion.h1
-                    initial={{ opacity: 0, scale: 0.95 }}
+                    initial={{ opacity: 0, scale: 0.98 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
-                    className="text-6xl md:text-8xl lg:text-[9rem] font-black text-white tracking-tighter leading-[0.9] mb-8 drop-shadow-2xl font-display"
+                    transition={{ duration: 0.5, delay: 0.1 }}
+                    className="text-5xl md:text-8xl lg:text-[9rem] font-black text-white tracking-tighter leading-[0.9] mb-8 drop-shadow-2xl font-display"
                 >
                     EXPLORE <br />
                     <Typewriter
                         words={["THE WORLD", "PARADISE", "ADVENTURE", "CULTURE"]}
-                        typeSpeed={100}
-                        deleteSpeed={50}
-                        delay={1500}
+                        typeSpeed={80}
+                        deleteSpeed={40}
+                        delay={1000}
                     />
                 </motion.h1>
 

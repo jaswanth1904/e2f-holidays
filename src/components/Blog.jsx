@@ -48,7 +48,7 @@ const Blog = () => {
                     viewport={{ once: true }}
                     className="text-center mb-16"
                 >
-                    <span className="text-brand-teal dark:text-brand-yellow font-bold tracking-widest uppercase text-xs mb-3 block">Travel Journal</span>
+                    <span className="text-brand-teal dark:text-brand-yellow font-bold tracking-widest uppercase text-xs mb-3 block"></span>
                     <h2 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white mb-4 font-display">
                         Stories from the <span className="font-script font-normal text-5xl md:text-6xl text-gray-400">Road</span>
                     </h2>

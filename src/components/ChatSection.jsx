@@ -195,7 +195,7 @@ const ChatSection = () => {
                             </div>
 
                             {/* Chat Area */}
-                            <div ref={scrollAreaRef} className="flex-1 overflow-y-auto px-4 pt-24 pb-20 flex flex-col scrollbar-hide">
+                            <div ref={scrollAreaRef} className="flex-1 overflow-y-auto px-4 pt-24 pb-20 flex flex-col [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']">
                                 <AnimatePresence mode="popLayout">
                                     {visibleMessages.map((msg, idx) => (
                                         <ChatBubble key={idx} message={msg} theme={theme} />

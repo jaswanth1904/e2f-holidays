@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { cruisePackages } from '../data/packages'; // Import data
+import { cruisePackages, tourPackages } from '../data/packages'; // Import data
 import { Link } from 'react-router-dom';
-import { Calendar, MapPin, Anchor, ArrowRight } from 'lucide-react';
+import { Calendar, MapPin, Anchor, ArrowRight, Plane } from 'lucide-react';
 
 const Features = () => {
     // Duplicate packages to create seamless loop
-    const marqueePackages = [...cruisePackages, ...cruisePackages];
+    const allPackages = [...cruisePackages, ...tourPackages];
+    const marqueePackages = [...allPackages, ...allPackages];
     const [isPaused, setIsPaused] = useState(false);
 
     return (
@@ -13,10 +14,10 @@ const Features = () => {
             <div className="max-w-7xl mx-auto px-4 md:px-12 mb-16 text-center">
                 <span className="text-brand-teal dark:text-brand-yellow font-semibold tracking-wider uppercase text-sm mb-4 block">Exclusive Offers</span>
                 <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-gray-900 dark:text-white mb-6">
-                    Featured <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-teal to-brand-blue">Cruise Packages</span>
+                    Featured <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-teal to-brand-blue">Holiday Packages</span>
                 </h2>
                 <p className="text-lg text-gray-500 dark:text-gray-200 max-w-2xl mx-auto">
-                    Discover the Indian coastline like never before. Premium experiences, curated for you.
+                    From luxury cruises to exotic international getaways. Curated for you.
                 </p>
             </div>
 
@@ -44,6 +45,7 @@ const Features = () => {
                                 <img
                                     src={pkg.image}
                                     alt={pkg.title}
+                                    loading="lazy"
                                     className="w-full h-full object-cover"
                                 />
                                 <span className="absolute top-4 right-4 bg-white/90 dark:bg-black/80 backdrop-blur text-gray-900 dark:text-white px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
@@ -55,8 +57,13 @@ const Features = () => {
                             <div className="p-6 flex flex-col justify-between flex-grow">
                                 <div>
                                     <div className="flex items-center gap-2 mb-3 text-brand-blue text-xs font-bold uppercase tracking-wide">
-                                        <Anchor className="w-3 h-3" />
+                                        {pkg.ship?.includes("Empress") || pkg.ship?.includes("River") ? <Anchor className="w-3 h-3" /> : <Plane className="w-3 h-3" />}
                                         {pkg.ship}
+                                    </div>
+                                    <div className="mb-2">
+                                        <span className="inline-block px-2 py-0.5 rounded-md bg-brand-teal/10 dark:bg-brand-teal/20 text-brand-teal dark:text-brand-yellow text-[10px] font-bold uppercase tracking-wider border border-brand-teal/20">
+                                            {pkg.destination}
+                                        </span>
                                     </div>
                                     <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 leading-snug line-clamp-2">
                                         {pkg.title}
@@ -65,7 +72,7 @@ const Features = () => {
                                     <div className="space-y-2 text-gray-500 dark:text-gray-300 text-sm mb-6">
                                         <div className="flex items-center gap-2">
                                             <Calendar className="w-4 h-4 text-brand-teal" />
-                                            <span>{pkg.dateRange}</span>
+                                            <span>{pkg.dateRange || "Customizable Dates"}</span>
                                         </div>
                                         <div className="flex items-center gap-2">
                                             <MapPin className="w-4 h-4 text-brand-teal" />

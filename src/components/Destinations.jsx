@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import ImageReveal from './ImageReveal';
 
 const DestinationCard = ({ id, name, image, delay }) => {
     return (
@@ -9,8 +10,20 @@ const DestinationCard = ({ id, name, image, delay }) => {
             whileHover={{ y: -10 }}
             className="group relative h-[500px] w-full rounded-3xl overflow-hidden cursor-pointer shadow-2xl transition-all"
         >
-            <img src={image} alt={name} loading="lazy" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent p-8 flex flex-col justify-end">
+            {/* 3D Image Reveal Component */}
+            <div className="absolute inset-0 z-0">
+                <ImageReveal
+                    src={image}
+                    alt={name}
+                    rows={6}
+                    cols={4}
+                    stiffness={100}
+                    damping={30}
+                />
+            </div>
+
+            {/* Overlay Content */}
+            <div className="absolute inset-0 z-20 bg-gradient-to-t from-black via-black/20 to-transparent p-8 flex flex-col justify-end pointer-events-none">
                 <div className="transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
                     <h3 className="text-3xl font-bold text-white mb-1 leading-tight">{name}</h3>
                 </div>

@@ -1,12 +1,42 @@
-import { useParams, Link } from 'react-router-dom';
-import { cruisePackages } from '../data/packages';
+import { useState, useEffect } from 'react';
+import { useParams, Link, useNavigate } from 'react-router-dom';
+import { cruisePackages, tourPackages } from '../data/packages';
 import { southIndiaPackages } from '../data/southIndiaPackages';
-import { MapPin, Calendar, Anchor, CheckCircle, XCircle } from 'lucide-react';
+import { MapPin, Calendar as CalendarIcon, Anchor, CheckCircle, XCircle, Info, ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const PackageDetails = () => {
     const { id } = useParams();
-    let pkgRaw = cruisePackages.find(p => p.id === id) || southIndiaPackages.find(p => p.id === id);
+    const navigate = useNavigate();
+    let pkgRaw = cruisePackages.find(p => p.id === id) || tourPackages.find(p => p.id === id) || southIndiaPackages.find(p => p.id === id);
+
+    // Calendar State
+    const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+    const [currentMonth, setCurrentMonth] = useState(new Date());
+
+    const getDaysInMonth = (date) => {
+        const year = date.getFullYear();
+        const month = date.getMonth();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysArray = [];
+        for (let i = 0; i < firstDay; i++) daysArray.push(null);
+        for (let i = 1; i <= daysInMonth; i++) daysArray.push(new Date(year, month, i));
+        return daysArray;
+    };
+
+    const isDateSelectable = (date) => {
+        if (!date) return false;
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        return date >= today;
+    };
+
+    const changeMonth = (increment) => {
+        const newDate = new Date(currentMonth);
+        newDate.setMonth(newDate.getMonth() + increment);
+        setCurrentMonth(newDate);
+    };
 
     // Normalize data if it's a South India package (missing detailed fields)
     let pkg = pkgRaw;
@@ -22,7 +52,9 @@ const PackageDetails = () => {
                 activity: `Explore the beautiful attractions and local culture of ${dest}. Overnight stay.`
             })) || [],
             inclusions: ["Premium Hotel Accommodation", "Daily Breakfast & Dinner", "AC Private Vehicle for Sightseeing", "All Tolls, Parking & Driver Bata"],
-            shows: ["Traditional Cultural Performance", "Local Sightseeing Tours"]
+            shows: ["Traditional Cultural Performance", "Local Sightseeing Tours"],
+            safetyOptions: ["Sanitized Cab", "Verified Drivers", "24/7 Support"],
+            otherDetails: "Entry fees to monuments not included in standard package cost."
         };
     }
 
@@ -41,6 +73,15 @@ const PackageDetails = () => {
         <div className="pt-24 min-h-screen bg-gray-50 dark:bg-black text-gray-900 dark:text-white pb-20">
             {/* Header Section */}
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
+                <button
+                    onClick={() => {
+                        const isSouthIndia = southIndiaPackages.some(p => p.id === id);
+                        navigate(isSouthIndia ? '/#south-india' : '/#packages');
+                    }}
+                    className="flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-brand-blue dark:text-gray-400 dark:hover:text-white mb-4 transition-colors group"
+                >
+                    <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" /> Back
+                </button>
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-gray-200 dark:border-gray-800 pb-6">
                     <div>
                         <h1 className="text-2xl md:text-3xl font-bold text-brand-blue mb-2">
@@ -48,7 +89,7 @@ const PackageDetails = () => {
                         </h1>
                         <div className="flex flex-wrap gap-4 text-sm text-gray-600 dark:text-gray-400">
                             <span className="flex items-center gap-1"><Anchor className="w-4 h-4" /> {pkg.ship}</span>
-                            <span className="flex items-center gap-1"><Calendar className="w-4 h-4" /> {pkg.dateRange}</span>
+                            <span className="flex items-center gap-1"><CalendarIcon className="w-4 h-4" /> {pkg.dateRange || "Flexible Dates"}</span>
                             <span className="flex items-center gap-1"><MapPin className="w-4 h-4" /> {pkg.route}</span>
                         </div>
                     </div>
@@ -84,7 +125,7 @@ const PackageDetails = () => {
                     {/* Itinerary Timeline */}
                     <div className="bg-white dark:bg-gray-900 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-800">
                         <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
-                            <Calendar className="w-5 h-5 text-brand-blue" /> Day Wise Itinerary
+                            <CalendarIcon className="w-5 h-5 text-brand-blue" /> Day Wise Itinerary
                         </h2>
                         <div className="space-y-8 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-slate-300 before:to-transparent">
                             {pkg.itinerary.map((item, index) => (
@@ -104,10 +145,88 @@ const PackageDetails = () => {
                             ))}
                         </div>
                     </div>
+                    {/* Other Details */}
+                    {pkg.otherDetails && (
+                        <div className="bg-white dark:bg-gray-900 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-800">
+                            <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+                                Important Information
+                            </h2>
+                            <div className="prose dark:prose-invert max-w-none text-sm text-gray-600 dark:text-gray-300">
+                                <p className="whitespace-pre-line">{pkg.otherDetails}</p>
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 {/* Right Column: Inclusions & Shows & Trust */}
                 <div className="space-y-6">
+                    {/* Travel Dates Selection */}
+                    <div className="bg-white dark:bg-gray-900 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-800">
+                        <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
+                            <CalendarIcon className="w-5 h-5 text-brand-blue" /> Select Travel Date
+                        </h3>
+
+                        {/* Compact Calendar */}
+                        <div className="bg-gray-50 dark:bg-gray-800/50 rounded-2xl p-4 border border-gray-100 dark:border-gray-800/50">
+                            <div className="flex justify-between items-center mb-4">
+                                <button onClick={() => changeMonth(-1)} className="p-1.5 hover:bg-white dark:hover:bg-gray-700 rounded-full transition-colors">
+                                    <ChevronLeft size={16} />
+                                </button>
+                                <span className="font-bold text-sm">
+                                    {currentMonth.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+                                </span>
+                                <button onClick={() => changeMonth(1)} className="p-1.5 hover:bg-white dark:hover:bg-gray-700 rounded-full transition-colors">
+                                    <ChevronRight size={16} />
+                                </button>
+                            </div>
+
+                            <div className="grid grid-cols-7 gap-1 text-center mb-2">
+                                {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(d => (
+                                    <span key={d} className="text-[10px] text-gray-400 font-bold uppercase">{d}</span>
+                                ))}
+                            </div>
+
+                            <div className="grid grid-cols-7 gap-1">
+                                {getDaysInMonth(currentMonth).map((day, idx) => {
+                                    const isSelected = day && day.toISOString().split('T')[0] === selectedDate;
+                                    const selectable = isDateSelectable(day);
+
+                                    return (
+                                        <div key={idx} className="aspect-square flex items-center justify-center">
+                                            {day && (
+                                                <button
+                                                    disabled={!selectable}
+                                                    onClick={() => {
+                                                        const offsetDate = new Date(day.getTime() - (day.getTimezoneOffset() * 60000));
+                                                        setSelectedDate(offsetDate.toISOString().split('T')[0]);
+                                                    }}
+                                                    className={`w-7 h-7 rounded-full text-[10px] font-bold flex items-center justify-center transition-all duration-200 relative
+                                                        ${isSelected
+                                                            ? 'bg-brand-blue text-white shadow-md'
+                                                            : selectable
+                                                                ? 'text-gray-700 dark:text-gray-300 hover:bg-brand-blue/10 hover:text-brand-blue'
+                                                                : 'text-gray-400 dark:text-gray-600 cursor-not-allowed opacity-40'}
+                                                    `}
+                                                >
+                                                    <span className={!selectable ? 'line-through opacity-50' : ''}>
+                                                        {day.getDate()}
+                                                    </span>
+                                                </button>
+                                            )}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+
+                        <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between">
+                            <span className="text-xs text-gray-500 font-medium uppercase tracking-wider">Date:</span>
+                            <span className="text-xs font-bold text-brand-blue">
+                                {new Date(selectedDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                            </span>
+                        </div>
+                    </div>
+
                     {/* Seamless Journey Trust Builder */}
                     <div className="bg-gradient-to-br from-brand-blue/5 to-white dark:from-gray-900 dark:to-gray-800 rounded-xl p-6 shadow-sm border border-brand-blue/10 dark:border-gray-700">
                         <h3 className="text-lg font-bold mb-4 text-brand-blue flex items-center gap-2">
@@ -200,7 +319,7 @@ const PackageDetails = () => {
                     </div>
                 </div>
             </div>
-        </div>
+        </div >
     );
 };
 

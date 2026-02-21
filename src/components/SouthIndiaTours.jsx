@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 
 const SouthIndiaTours = () => {
     return (
-        <section className="py-24 bg-white dark:bg-black transition-colors duration-500 overflow-hidden">
+        <section id="south-india" className="py-24 bg-white dark:bg-black transition-colors duration-500 overflow-hidden">
             <div className="max-w-7xl mx-auto px-4 md:px-12">
 
                 {/* Header with Animation */}

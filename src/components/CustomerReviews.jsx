@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, useMotionValue, useTransform } from 'framer-motion';
 import { Quote, Star, Send, CheckCircle } from 'lucide-react';
 
@@ -70,8 +70,9 @@ const Card = ({ data, index, moveToEnd }) => {
             }}
             transition={{
                 type: "spring",
-                stiffness: 260,
-                damping: 20,
+                stiffness: 100,
+                damping: 25,
+                mass: 1.2, // Adds a bit of weight for a premium feel
             }}
             className={`absolute top-0 w-full bg-white dark:bg-zinc-900 rounded-[2rem] shadow-2xl p-8 md:p-12 flex flex-col items-center text-center border border-gray-100 dark:border-gray-800 h-[400px] md:h-[450px] justify-center ${isTop ? "cursor-grab active:cursor-grabbing" : "pointer-events-none"}`}
         >
@@ -227,6 +228,23 @@ const FeedbackForm = ({ onAddReview }) => {
 
 const CustomerReviews = () => {
     const [cards, setCards] = useState(reviewsData);
+    const [isPaused, setIsPaused] = useState(false);
+
+    // Auto-cycle effect
+    useEffect(() => {
+        if (isPaused) return;
+
+        const interval = setInterval(() => {
+            setCards((prev) => {
+                const newCards = [...prev];
+                const movedCard = newCards.shift();
+                newCards.push(movedCard);
+                return newCards;
+            });
+        }, 4000); // Auto-slide every 4 seconds
+
+        return () => clearInterval(interval);
+    }, [isPaused]);
 
     const moveToEnd = () => {
         setCards((prev) => {
@@ -268,7 +286,11 @@ const CustomerReviews = () => {
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                     {/* Left Column: Swipe Stack */}
-                    <div className="flex flex-col items-center">
+                    <div
+                        className="flex flex-col items-center"
+                        onMouseEnter={() => setIsPaused(true)}
+                        onMouseLeave={() => setIsPaused(false)}
+                    >
                         <div className="relative w-full max-w-xl h-[480px] flex items-center justify-center">
                             {cards.map((card, index) => (
                                 <Card
@@ -280,7 +302,7 @@ const CustomerReviews = () => {
                             ))}
                         </div>
                         <p className="mt-8 text-sm text-gray-400 flex items-center gap-2">
-                            <span className="animate-pulse">←</span> Drag card to read more <span className="animate-pulse">→</span>
+                            <span className="animate-pulse">←</span> Drag card or wait to read more <span className="animate-pulse">→</span>
                         </p>
                     </div>
 
