@@ -44,9 +44,9 @@ const Contact = () => {
                             </div>
                             <div>
                                 <h4 className="text-xl font-bold text-gray-900 dark:text-white mb-2 font-display">Email Us</h4>
-                                <p className="text-gray-500 dark:text-gray-400 max-w-xs block hover:text-brand-yellow transition-colors cursor-pointer">
-                                    hello@e2fholidays.com
-                                </p>
+                                <a href="mailto:e2fhoildays@gmail.com" className="text-gray-500 dark:text-gray-400 max-w-xs block hover:text-brand-yellow transition-colors">
+                                    e2fhoildays@gmail.com
+                                </a>
                             </div>
                         </div>
 
@@ -56,9 +56,9 @@ const Contact = () => {
                             </div>
                             <div>
                                 <h4 className="text-xl font-bold text-gray-900 dark:text-white mb-2 font-display">Call Us</h4>
-                                <p className="text-gray-500 dark:text-gray-400 max-w-xs block hover:text-brand-yellow transition-colors cursor-pointer">
-                                    +91-98765-43210
-                                </p>
+                                <a href="https://wa.me/919642810644" target="_blank" rel="noopener noreferrer" className="text-gray-500 dark:text-gray-400 max-w-xs block hover:text-[#25D366] transition-colors font-bold">
+                                    +91 96428 10644 (WhatsApp)
+                                </a>
                                 <p className="text-gray-400 text-sm mt-1">Mon-Sat, 9am - 7pm IST</p>
                             </div>
                         </div>
@@ -92,7 +92,7 @@ const Contact = () => {
                             <label className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 ml-1">Email Address</label>
                             <input
                                 type="email"
-                                value="hello@e2fholidays.com"
+                                value="e2fhoildays@gmail.com"
                                 readOnly
                                 className="w-full bg-gray-200 dark:bg-zinc-800 border border-transparent rounded-xl px-4 py-3 outline-none transition-all text-gray-600 dark:text-gray-400 cursor-not-allowed select-none"
                             />

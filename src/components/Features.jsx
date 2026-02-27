@@ -3,6 +3,7 @@ import { cruisePackages, tourPackages } from '../data/packages'; // Import data
 import { Link } from 'react-router-dom';
 import { Calendar, MapPin, Anchor, ArrowRight, Plane } from 'lucide-react';
 
+
 const Features = () => {
     // Duplicate packages to create seamless loop
     const allPackages = [...cruisePackages, ...tourPackages];
@@ -97,6 +98,36 @@ const Features = () => {
                             </div>
                         </div>
                     ))}
+                </div>
+            </div>
+
+            {/* Minimal Custom Request Section */}
+            <div className="max-w-4xl mx-auto px-6 mt-16 text-center">
+                <div className="bg-white dark:bg-zinc-900 rounded-[2.5rem] p-8 md:p-12 border border-gray-100 dark:border-gray-800 shadow-xl relative overflow-hidden group">
+                    <div className="relative z-10">
+                        <h3 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-4">
+                            Didn't find your <span className="text-brand-blue">dream destination</span>?
+                        </h3>
+                        <p className="text-gray-600 dark:text-gray-300 text-base md:text-lg mb-8 max-w-xl mx-auto font-medium leading-relaxed">
+                            Don't worry! Call us or send an email about your favorite place. We will get in touch with you shortly to plan the perfect trip.
+                        </p>
+                        <div className="flex flex-wrap justify-center gap-5">
+                            <a
+                                href="https://wa.me/919642810644"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-3 px-8 py-3 rounded-full bg-[#25D366] text-white font-bold text-sm hover:bg-[#128C7E] transition-all shadow-lg shadow-[#25D366]/20"
+                            >
+                                💬 WhatsApp Us
+                            </a>
+                            <a
+                                href="mailto:e2fhoildays@gmail.com"
+                                className="flex items-center gap-3 px-8 py-3 rounded-full bg-brand-blue text-white font-bold text-sm hover:bg-brand-dark transition-all shadow-lg shadow-brand-blue/20"
+                            >
+                                📩 Send Email
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>

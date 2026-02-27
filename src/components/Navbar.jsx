@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Sun, Moon, Menu, X, Search, Calendar, MapPin, Facebook, Twitter, Instagram, ChevronLeft, ChevronRight } from 'lucide-react'; // Added Chevrons
+import { Sun, Moon, Menu, X, Search, Calendar, MapPin, Facebook, Twitter, Instagram, ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { cruisePackages, tourPackages } from '../data/packages';
-import { southIndiaPackages } from '../data/southIndiaPackages';
+import LogoImg from '../assets/E2F Holidays Logo.png';
 
 
 const Navbar = ({ toggleDarkMode, isDarkMode }) => {
@@ -36,13 +35,17 @@ const Navbar = ({ toggleDarkMode, isDarkMode }) => {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
-    const handleSearch = () => {
+    const handleSearch = async () => {
         if (!searchQuery.trim()) return;
 
         const query = searchQuery.toLowerCase();
-
-        // Clear input immediately per user request
         setSearchQuery('');
+
+        // Dynamic import to keep data out of main bundle
+        const [{ cruisePackages, tourPackages }, { southIndiaPackages }] = await Promise.all([
+            import('../data/packages'),
+            import('../data/southIndiaPackages')
+        ]);
 
         const allPackages = [...cruisePackages, ...tourPackages, ...southIndiaPackages];
 
@@ -55,7 +58,6 @@ const Navbar = ({ toggleDarkMode, isDarkMode }) => {
         if (match) {
             navigate(`/package/${match.id}`);
         } else {
-            // Use setTimeout to allow the state update (clearing input) to render before alerting
             setTimeout(() => {
                 alert("We apologize for the inconvenience, We couldn't find a package for your search.");
             }, 50);
@@ -96,9 +98,12 @@ const Navbar = ({ toggleDarkMode, isDarkMode }) => {
                 }`}>
                 <div className="max-w-[1400px] mx-auto px-6 md:px-12 flex justify-between items-center h-full">
 
-                    {/* 1. Left: Cursive Logo */}
-                    <Link to="/" className="flex-shrink-0 z-50">
-                        <h1 className="font-script text-4xl md:text-5xl text-brand-blue dark:text-white transition-colors duration-300 select-none">
+                    {/* 1. Left: Logo & Text */}
+                    <Link to="/" className="flex-shrink-0 z-50 flex items-center gap-3 group">
+                        <div className="w-12 h-12 md:w-16 md:h-16 group-hover:scale-110 transition-transform duration-300">
+                            <img src={LogoImg} alt="E2F Holidays Logo" className="w-full h-full object-contain" />
+                        </div>
+                        <h1 className="font-script text-3xl md:text-4xl text-brand-blue dark:text-white transition-colors duration-300 select-none">
                             E2F Holidays
                         </h1>
                     </Link>

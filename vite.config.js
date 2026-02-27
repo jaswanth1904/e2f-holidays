@@ -10,5 +10,18 @@ export default defineConfig({
   ],
   server: {
     allowedHosts: true
+  },
+  build: {
+    target: 'esnext',
+    minify: 'esbuild',
+    cssMinify: true,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+          'vendor-ui': ['framer-motion', 'lucide-react'],
+        }
+      }
+    }
   }
 })

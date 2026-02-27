@@ -1,18 +1,65 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { cruisePackages, tourPackages } from '../data/packages';
-import { southIndiaPackages } from '../data/southIndiaPackages';
 import { MapPin, Calendar as CalendarIcon, Anchor, CheckCircle, XCircle, Info, ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const PackageDetails = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    let pkgRaw = cruisePackages.find(p => p.id === id) || tourPackages.find(p => p.id === id) || southIndiaPackages.find(p => p.id === id);
+    const [pkgData, setPkgData] = useState(null);
+    const [loading, setLoading] = useState(true);
 
     // Calendar State
     const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
     const [currentMonth, setCurrentMonth] = useState(new Date());
+
+    useEffect(() => {
+        const loadPackage = async () => {
+            setLoading(true);
+            try {
+                // Dynamically import data files
+                const [{ cruisePackages, tourPackages }, { southIndiaPackages }] = await Promise.all([
+                    import('../data/packages'),
+                    import('../data/southIndiaPackages')
+                ]);
+
+                const found = cruisePackages.find(p => p.id === id) ||
+                    tourPackages.find(p => p.id === id) ||
+                    southIndiaPackages.find(p => p.id === id);
+
+                if (found) {
+                    setPkgData(found);
+                } else {
+                    const res = await fetch('/api/packages');
+                    const allData = await res.json();
+                    const apiFound = allData.find(p => p.id === id);
+                    if (apiFound) setPkgData(apiFound);
+                }
+            } catch (err) {
+                console.error("Failed to load package:", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        loadPackage();
+    }, [id]);
+
+    if (loading) {
+        return (
+            <div className="pt-32 pb-24 flex items-center justify-center min-h-screen">
+                <div className="w-12 h-12 border-4 border-brand-blue border-t-transparent rounded-full animate-spin"></div>
+            </div>
+        );
+    }
+
+    if (!pkgData) {
+        return (
+            <div className="pt-32 pb-24 text-center min-h-screen">
+                <h1 className="text-2xl font-bold">Package Not Found</h1>
+                <Link to="/" className="text-brand-blue hover:underline mt-4 inline-block">Return Home</Link>
+            </div>
+        );
+    }
 
     const getDaysInMonth = (date) => {
         const year = date.getFullYear();
@@ -39,24 +86,21 @@ const PackageDetails = () => {
     };
 
     // Normalize data if it's a South India package (missing detailed fields)
-    let pkg = pkgRaw;
-    if (pkgRaw && !pkgRaw.itinerary) {
-        pkg = {
-            ...pkgRaw,
-            dateRange: "Flexible Dates",
-            ship: "Private Vehicle",
-            route: pkgRaw.destinations?.join(" → "),
-            itinerary: pkgRaw.destinations?.map((dest, i) => ({
-                day: i + 1,
-                port: dest,
-                activity: `Explore the beautiful attractions and local culture of ${dest}. Overnight stay.`
-            })) || [],
-            inclusions: ["Premium Hotel Accommodation", "Daily Breakfast & Dinner", "AC Private Vehicle for Sightseeing", "All Tolls, Parking & Driver Bata"],
-            shows: ["Traditional Cultural Performance", "Local Sightseeing Tours"],
-            safetyOptions: ["Sanitized Cab", "Verified Drivers", "24/7 Support"],
-            otherDetails: "Entry fees to monuments not included in standard package cost."
-        };
-    }
+    const pkg = pkgData?.itinerary ? pkgData : {
+        ...pkgData,
+        dateRange: "Flexible Dates",
+        ship: "Private Vehicle",
+        route: pkgData?.destinations?.join(" → "),
+        itinerary: pkgData?.destinations?.map((dest, i) => ({
+            day: i + 1,
+            port: dest,
+            activity: `Explore the beautiful attractions and local culture of ${dest}. Overnight stay.`
+        })) || [],
+        inclusions: ["Premium Hotel Accommodation", "Daily Breakfast & Dinner", "AC Private Vehicle for Sightseeing", "All Tolls, Parking & Driver Bata"],
+        shows: ["Traditional Cultural Performance", "Local Sightseeing Tours"],
+        safetyOptions: ["Sanitized Cab", "Verified Drivers", "24/7 Support"],
+        otherDetails: "Entry fees to monuments not included in standard package cost."
+    };
 
     if (!pkg) {
         return (
@@ -75,7 +119,7 @@ const PackageDetails = () => {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
                 <button
                     onClick={() => {
-                        const isSouthIndia = southIndiaPackages.some(p => p.id === id);
+                        const isSouthIndia = !!pkgData?.destinations;
                         navigate(isSouthIndia ? '/#south-india' : '/#packages');
                     }}
                     className="flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-brand-blue dark:text-gray-400 dark:hover:text-white mb-4 transition-colors group"
@@ -96,10 +140,12 @@ const PackageDetails = () => {
                     <div className="mt-4 md:mt-0 text-right">
                         <p className="text-lg font-medium text-gray-600 dark:text-gray-300 mb-2">Interested in this experience?</p>
                         <a
-                            href={`mailto:hello@e2fholidays.com?subject=${encodeURIComponent(`Enquiry for ${pkg.title}`)}&body=${encodeURIComponent(`Hi,\n\nI am interested in the ${pkg.title} package.\n\nPlease share the best price and availability.\n\nThanks`)}`}
-                            className="inline-block mt-2 bg-gradient-to-r from-brand-red to-brand-yellow hover:from-brand-red/90 hover:to-brand-yellow/90 text-white px-8 py-3 rounded-md font-semibold transition-all shadow-lg hover:shadow-xl"
+                            href={`https://wa.me/919642810644?text=${encodeURIComponent(`Hi, I'm interested in the ${pkg.title} package. Please share details.`)}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-block mt-2 bg-gradient-to-r from-[#25D366] to-[#128C7E] hover:from-[#128C7E] hover:to-[#075E54] text-white px-8 py-3 rounded-md font-semibold transition-all shadow-lg hover:shadow-xl"
                         >
-                            Email Us for Quote
+                            WhatsApp for Best Price
                         </a>
                     </div>
                 </div>
@@ -181,8 +227,8 @@ const PackageDetails = () => {
                             </div>
 
                             <div className="grid grid-cols-7 gap-1 text-center mb-2">
-                                {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(d => (
-                                    <span key={d} className="text-[10px] text-gray-400 font-bold uppercase">{d}</span>
+                                {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((d, i) => (
+                                    <span key={`${d}-${i}`} className="text-[10px] text-gray-400 font-bold uppercase">{d}</span>
                                 ))}
                             </div>
 
@@ -273,12 +319,13 @@ const PackageDetails = () => {
                                 Our experts are here to help you plan the perfect getaway. We are just a call away.
                             </p>
                             <div className="space-y-3">
-                                <div className="block w-full py-3 rounded-lg bg-brand-teal text-white font-bold flex items-center justify-center gap-2 cursor-default">
-                                    📞 Call +91 98765 43210
-                                </div>
-                                <div className="block w-full py-3 rounded-lg border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-white font-medium cursor-default">
-                                    📩 hello@e2fholidays.com
-                                </div>
+                                <a href="https://wa.me/919642810644" target="_blank" rel="noopener noreferrer" className="block w-full py-3 rounded-lg bg-[#25D366] text-white font-bold flex items-center justify-center gap-2 hover:bg-[#128C7E] transition-colors shadow-lg">
+                                    <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M12.031 6.172c-2.31 0-4.191 1.881-4.191 4.192 0 .61.131 1.189.365 1.714l-.45 1.642 1.685-.442c.504.209 1.057.324 1.591.324 2.31 0 4.191-1.881 4.191-4.192s-1.881-4.192-4.191-4.192zm3.322 5.923c-.15.209-.851.815-1.168.815-.316 0-.622-.053-1.096-.242-.473-.188-1.042-.416-1.503-.844-.462-.428-.737-.806-.931-1.127-.193-.321-.193-.54-.15-.75.043-.209.15-.321.225-.428.075-.107.13-.188.13-.188s.023-.043.037-.064c.014-.022.023-.053.023-.085 0-.032-.014-.064-.037-.085-.022-.022-.13-.321-.183-.448-.052-.128-.106-.246-.15-.321-.044-.075-.084-.107-.13-.107-.045 0-.083.011-.132.043-.047.032-.214.209-.214.509 0 .299.219.589.247.632.028.043.432.664 1.046 1.127.615.463 1.139.632 1.536.685.397.054.76.043 1.046.011.286-.032.873-.357 1.002-.697.129-.339.129-.631.09-.696-.038-.065-.13-.107-.272-.177zM12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm.019 18.298c-1.171 0-2.31-.299-3.322-.862l-3.322.873.884-3.238c-.622-1.066-.95-2.285-.95-3.53s.328-2.464.95-3.53l-.884-3.238 3.322.873c1.012-.563 2.151-.862 3.322-.862 3.737 0 6.777 3.04 6.777 6.777s-3.04 6.777-6.777 6.777z" /></svg>
+                                    WhatsApp Now
+                                </a>
+                                <a href="mailto:e2fhoildays@gmail.com" className="block w-full py-3 rounded-lg border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-white font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors flex items-center justify-center gap-2">
+                                    📩 Email for Booking
+                                </a>
                             </div>
                         </div>
                     </div>

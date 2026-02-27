@@ -159,7 +159,7 @@ const ChatSection = () => {
                         </span>
                     </h2>
                     <p className="text-lg text-gray-500 dark:text-gray-400 mb-8 leading-relaxed">
-                        Planning a trip should be as easy as chatting with a friend. From instant itinerary customizations to on-trip support, E2F Holidays ensures you're never alone on your journey. Drop us a mail at <a href="mailto:hello@e2fholidays.com" className="text-brand-blue hover:underline">hello@e2fholidays.com</a>
+                        Planning a trip should be as easy as chatting with a friend. From instant itinerary customizations to on-trip support, E2F Holidays ensures you're never alone on your journey. Drop us a mail at <a href="mailto:e2fhoildays@gmail.com" className="text-brand-blue hover:underline">e2fhoildays@gmail.com</a>
                     </p>
                 </div>
 

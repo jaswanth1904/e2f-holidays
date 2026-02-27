@@ -1,13 +1,16 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
+// Optimization: Using a helper to generate responsive widths for Pexels images
+const getOptimizedUrl = (url, width = 1200) => `${url}&w=${width}&q=60`;
+
 export const heroImages = [
-    "https://images.pexels.com/photos/5138790/pexels-photo-5138790.jpeg?auto=compress&cs=tinysrgb&w=1920&q=75", // India Gate / Monument
-    "https://images.pexels.com/photos/1646870/pexels-photo-1646870.jpeg?auto=compress&cs=tinysrgb&w=1920&q=75", // Taj Mahal
-    "https://images.pexels.com/photos/774282/pexels-photo-774282.jpeg?auto=compress&cs=tinysrgb&w=1920&q=75", // Beach
-    "https://images.pexels.com/photos/2309271/pexels-photo-2309271.jpeg?auto=compress&cs=tinysrgb&w=1920&q=75", // Mountains
-    "https://images.pexels.com/photos/34779145/pexels-photo-34779145.jpeg?auto=compress&cs=tinysrgb&w=1920&q=75", // Culture
-    "https://images.pexels.com/photos/13452880/pexels-photo-13452880.jpeg?auto=compress&cs=tinysrgb&w=1920&q=75" // Nature
+    "https://images.pexels.com/photos/5138790/pexels-photo-5138790.jpeg?auto=compress&cs=tinysrgb", // India Gate
+    "https://images.pexels.com/photos/1646870/pexels-photo-1646870.jpeg?auto=compress&cs=tinysrgb", // Taj Mahal
+    "https://images.pexels.com/photos/774282/pexels-photo-774282.jpeg?auto=compress&cs=tinysrgb", // Beach
+    "https://images.pexels.com/photos/2309271/pexels-photo-2309271.jpeg?auto=compress&cs=tinysrgb", // Mountains
+    "https://images.pexels.com/photos/34779145/pexels-photo-34779145.jpeg?auto=compress&cs=tinysrgb", // Culture
+    "https://images.pexels.com/photos/13452880/pexels-photo-13452880.jpeg?auto=compress&cs=tinysrgb" // Nature
 ];
 
 const Typewriter = ({ words, typeSpeed = 100, deleteSpeed = 50, delay = 1500 }) => {
@@ -90,10 +93,16 @@ const Hero = () => {
                         className="absolute inset-0 w-full h-full"
                     >
                         <img
-                            src={heroImages[currentImage]}
-                            width="1920"
-                            height="1080"
-                            fetchpriority="high"
+                            src={getOptimizedUrl(heroImages[currentImage], 1200)}
+                            srcSet={`
+                                ${getOptimizedUrl(heroImages[currentImage], 600)} 600w,
+                                ${getOptimizedUrl(heroImages[currentImage], 1000)} 1000w,
+                                ${getOptimizedUrl(heroImages[currentImage], 1200)} 1200w
+                            `}
+                            sizes="100vw"
+                            width="1200"
+                            height="700"
+                            fetchPriority="high"
                             className="absolute inset-0 w-full h-full object-cover"
                             alt="India Tourism Destinations"
                         />
