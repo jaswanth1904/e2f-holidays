@@ -16,7 +16,7 @@ const Navbar = ({ toggleDarkMode, isDarkMode }) => {
     useEffect(() => {
         const fetchSettings = async () => {
             try {
-                const { data } = await axios.get('http://localhost:5000/api/settings');
+                const { data } = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/settings`);
                 if (data && data.logo) setLogoUrl(data.logo);
             } catch (error) {
                 console.error("Error fetching settings:", error);

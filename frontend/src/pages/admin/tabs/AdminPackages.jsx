@@ -24,7 +24,7 @@ const AdminPackages = () => {
 
     const fetchPackages = async () => {
         try {
-            const { data } = await axios.get('http://localhost:5000/api/packages');
+            const { data } = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/packages`);
             setPackages(data);
         } catch (error) {
             console.error('Failed to fetch packages:', error);
@@ -66,7 +66,7 @@ const AdminPackages = () => {
         formData.append('image', file);
         try {
             const config = { headers: { 'Content-Type': 'multipart/form-data', Authorization: `Bearer ${admin?.token || 'fake_token'}` } };
-            const { data } = await axios.post('http://localhost:5000/api/upload', formData, config);
+            const { data } = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/upload`, formData, config);
             handleChange('image', data.url);
             addToast('Image uploaded', 'success');
         } catch (error) {
@@ -92,10 +92,10 @@ const AdminPackages = () => {
         try {
             const config = { headers: { Authorization: `Bearer ${admin?.token || 'fake_token'}` } };
             if (currentId) {
-                await axios.put(`http://localhost:5000/api/packages/${currentId}`, payload, config);
+                await axios.put(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/packages/${currentId}`, payload, config);
                 addToast('Package updated successfully!', 'success');
             } else {
-                await axios.post('http://localhost:5000/api/packages', payload, config);
+                await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/packages`, payload, config);
                 addToast('Package added successfully!', 'success');
             }
             setIsEditing(false);
@@ -109,7 +109,7 @@ const AdminPackages = () => {
     const handleDelete = async () => {
         try {
             const config = { headers: { Authorization: `Bearer ${admin?.token || 'fake_token'}` } };
-            await axios.delete(`http://localhost:5000/api/packages/${deleteId}`, config);
+            await axios.delete(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/packages/${deleteId}`, config);
             addToast('Package deleted!', 'success');
             setDeleteId(null);
             fetchPackages();

@@ -1,4 +1,5 @@
 import { useState, useEffect, Suspense, lazy } from 'react';
+import { HelmetProvider } from 'react-helmet-async';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
@@ -130,15 +131,17 @@ function App() {
   const toggleDarkMode = () => setIsDarkMode(prev => !prev);
 
   return (
-    <AuthProvider>
-      <Router>
-        <ImagePreloader />
-        <ErrorBoundary>
-          <ScrollToTop />
-          <AppContent isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} showScrollTop={showScrollTop} />
-        </ErrorBoundary>
-      </Router>
-    </AuthProvider>
+    <HelmetProvider>
+      <AuthProvider>
+        <Router>
+          <ImagePreloader />
+          <ErrorBoundary>
+            <ScrollToTop />
+            <AppContent isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} showScrollTop={showScrollTop} />
+          </ErrorBoundary>
+        </Router>
+      </AuthProvider>
+    </HelmetProvider>
   );
 }
 

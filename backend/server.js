@@ -28,7 +28,7 @@ app.use('/api', limiter);
 
 // CORS configuration (allow frontend only in prod)
 app.use(cors({
-    origin: process.env.NODE_ENV === 'production' ? ['https://e2fholidays.com', 'https://www.e2fholidays.com'] : true,
+    origin: process.env.NODE_ENV === 'production' ? ['https://e2fholidays.com', 'https://www.e2fholidays.com'] : ['http://localhost:5173', 'http://127.0.0.1:5173'],
     credentials: true
 }));
 
@@ -36,6 +36,11 @@ app.use(express.json());
 
 app.get('/', (req, res) => {
     res.send('API is running...');
+});
+
+// Health Check for Render Deployment
+app.get('/api/health', (req, res) => {
+    res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
 // Routes

@@ -17,7 +17,7 @@ const AdminHeader = () => {
 
     const fetchSettings = async () => {
         try {
-            const { data } = await axios.get('http://localhost:5000/api/settings');
+            const { data } = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/settings`);
             if (data) {
                 setContactPhone(data.contactPhone || '');
                 setContactEmail(data.contactEmail || '');
@@ -33,7 +33,7 @@ const AdminHeader = () => {
         formData.append('image', file);
         try {
             const config = { headers: { 'Content-Type': 'multipart/form-data', Authorization: `Bearer ${admin?.token || 'fake_token'}` } };
-            const { data } = await axios.post('http://localhost:5000/api/upload', formData, config);
+            const { data } = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/upload`, formData, config);
             setLogoPreview(data.url);
             addToast('Logo uploaded', 'success');
         } catch (error) {
@@ -45,7 +45,7 @@ const AdminHeader = () => {
     const handleSave = async () => {
         try {
             const config = { headers: { Authorization: `Bearer ${admin?.token || 'fake_token'}` } };
-            await axios.put('http://localhost:5000/api/settings', { contactPhone, contactEmail, logo: logoPreview }, config);
+            await axios.put(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/settings`, { contactPhone, contactEmail, logo: logoPreview }, config);
             addToast('Header settings saved successfully!', 'success');
         } catch (error) {
             console.error(error);

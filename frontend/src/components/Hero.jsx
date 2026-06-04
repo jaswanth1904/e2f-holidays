@@ -78,7 +78,7 @@ const Hero = () => {
         const fetchSettings = async () => {
             try {
                 const axios = (await import('axios')).default;
-                const { data } = await axios.get('http://localhost:5000/api/settings');
+                const { data } = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/settings`);
                 if (data) {
                     setHeroData({
                         heading: data.heroHeading || "EXPLORE THE WORLD",

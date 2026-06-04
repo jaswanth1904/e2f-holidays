@@ -15,11 +15,11 @@ const Footer = () => {
     useEffect(() => {
         const fetchSettings = async () => {
             try {
-                const { data } = await axios.get('http://localhost:5000/api/settings');
+                const { data } = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/settings`);
                 if (data) {
                     setSettings({
-                        contactPhone: data.contactPhone || '+91 96428 10644',
-                        contactEmail: data.contactEmail || 'e2fhoildays@gmail.com',
+                        contactPhone: '+91 96428 10644', // Forced as per request
+                        contactEmail: 'e2fhoildays@gmail.com', // Forced as per request
                         socialLinks: data.socialLinks || {},
                         logo: data.logo || LogoImg
                     });
@@ -64,11 +64,11 @@ const Footer = () => {
                 {/* Contact Info */}
                 <div className="flex flex-col gap-2">
                     <h3 className="font-bold text-sky-400 uppercase tracking-widest text-[10px] mb-1">Contact Us</h3>
-                    <a href={`https://wa.me/${settings.contactPhone.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" className="font-medium text-white hover:text-[#25D366] transition-colors text-sm flex items-center gap-2">
-                        <span>📱 {settings.contactPhone}</span>
+                    <a href={`https://wa.me/919642810644`} target="_blank" rel="noopener noreferrer" className="font-medium text-white hover:text-[#25D366] transition-colors text-sm flex items-center gap-2">
+                        <span>📱 Call/WhatsApp: +91 96428 10644</span>
                     </a>
-                    <a href={`mailto:${settings.contactEmail}`} className="font-medium text-white hover:text-sky-300 transition-colors text-sm">
-                        📩 {settings.contactEmail}
+                    <a href={`mailto:e2fhoildays@gmail.com`} className="font-medium text-white hover:text-sky-300 transition-colors text-sm">
+                        📩 Email: e2fhoildays@gmail.com
                     </a>
                 </div>
 

@@ -12,7 +12,7 @@ const Features = () => {
     useEffect(() => {
         const fetchPackages = async () => {
             try {
-                const { data } = await axios.get('http://localhost:5000/api/packages');
+                const { data } = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/packages`);
                 setAllPackages(data);
             } catch (error) {
                 console.error("Error fetching packages:", error);
@@ -53,44 +53,45 @@ const Features = () => {
                     {marqueePackages.map((pkg, idx) => (
                         <div
                             key={`${pkg.id}-${idx}`}
-                            className="w-[300px] md:w-[400px] shrink-0 bg-white dark:bg-gray-900 rounded-[2rem] overflow-hidden shadow-xl border border-gray-100 dark:border-gray-800 flex flex-col hover:scale-[1.02] transition-transform duration-300"
+                            className="w-[260px] md:w-[320px] shrink-0 bg-white dark:bg-gray-900 rounded-3xl overflow-hidden shadow-xl border border-gray-100 dark:border-gray-800 flex flex-col hover:scale-[1.02] transition-transform duration-300"
                         >
                             {/* Image Half */}
-                            <div className="h-64 relative overflow-hidden">
+                            <div className="h-52 relative overflow-hidden">
                                 <img
                                     src={optimizeImage(pkg.image, 600)}
                                     alt={pkg.title}
                                     loading="lazy"
                                     className="w-full h-full object-cover"
                                 />
-                                <span className="absolute top-4 right-4 bg-white/90 dark:bg-black/80 backdrop-blur text-gray-900 dark:text-white px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
+                                <span className="absolute top-4 right-4 bg-white/90 dark:bg-black/80 backdrop-blur text-gray-900 dark:text-white px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-sm">
                                     {pkg.duration}
                                 </span>
                             </div>
 
                             {/* Content Half */}
-                            <div className="p-6 flex flex-col justify-between flex-grow">
+                            <div className="p-5 flex flex-col justify-between flex-grow">
                                 <div>
-                                    <div className="flex items-center gap-2 mb-3 text-brand-blue text-xs font-bold uppercase tracking-wide">
-                                        {pkg.ship?.includes("Empress") || pkg.ship?.includes("River") ? <Anchor className="w-3 h-3" /> : <Plane className="w-3 h-3" />}
-                                        {pkg.ship}
-                                    </div>
-                                    <div className="mb-2">
-                                        <span className="inline-block px-2 py-0.5 rounded-md bg-brand-teal/10 dark:bg-brand-teal/20 text-brand-teal dark:text-brand-yellow text-[10px] font-bold uppercase tracking-wider border border-brand-teal/20">
+                                    <div className="flex items-center justify-between mb-2">
+                                        <span className="inline-block px-2 py-0.5 rounded border border-brand-teal/20 bg-brand-teal/5 dark:bg-brand-teal/10 text-brand-teal dark:text-brand-yellow text-[10px] font-bold uppercase tracking-wider">
                                             {pkg.destination}
                                         </span>
+                                        <div className="flex items-center gap-1.5 text-brand-blue text-[10px] font-bold uppercase tracking-wider">
+                                            {pkg.ship?.includes("Empress") || pkg.ship?.includes("River") ? <Anchor className="w-3 h-3" /> : <Plane className="w-3 h-3" />}
+                                            <span className="truncate max-w-[80px]">{pkg.ship}</span>
+                                        </div>
                                     </div>
-                                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 leading-snug line-clamp-2">
+                                    
+                                    <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2 leading-snug line-clamp-2">
                                         {pkg.title}
                                     </h3>
 
-                                    <div className="space-y-2 text-gray-500 dark:text-gray-300 text-sm mb-6">
+                                    <div className="space-y-1.5 text-gray-500 dark:text-gray-300 text-xs mb-4">
                                         <div className="flex items-center gap-2">
-                                            <Calendar className="w-4 h-4 text-brand-teal" />
-                                            <span>{pkg.dateRange || "Customizable Dates"}</span>
+                                            <Calendar className="w-3.5 h-3.5 text-brand-teal shrink-0" />
+                                            <span className="truncate">{pkg.dateRange || "Customizable Dates"}</span>
                                         </div>
                                         <div className="flex items-center gap-2">
-                                            <MapPin className="w-4 h-4 text-brand-teal" />
+                                            <MapPin className="w-3.5 h-3.5 text-brand-teal shrink-0" />
                                             <span className="truncate">{pkg.route}</span>
                                         </div>
                                     </div>
@@ -98,8 +99,9 @@ const Features = () => {
 
                                 <div className="border-t border-gray-100 dark:border-gray-800 pt-4 flex items-center justify-between mt-auto">
                                     <div>
+                                        <p className="text-[10px] uppercase text-gray-400 font-bold mb-0.5">Starting From</p>
                                         <p className="text-sm font-bold text-brand-blue dark:text-brand-yellow">
-                                            Contact for Best Price
+                                            ₹{pkg.price ? pkg.price.toLocaleString('en-IN') : 'Call Us'}
                                         </p>
                                     </div>
                                     <Link

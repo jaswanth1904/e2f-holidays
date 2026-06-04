@@ -7,9 +7,10 @@ import {
     PackageSearch,
     MessageSquare,
     MapPin,
-    Image as ImageIcon
+    Image as ImageIcon,
+    Users
 } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
 
 const StatCard = ({ title, value, icon: Icon, trend, trendLabel, colorClass = "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30" }) => (
     <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow relative overflow-hidden">
@@ -37,14 +38,26 @@ const StatCard = ({ title, value, icon: Icon, trend, trendLabel, colorClass = "t
 
 const AdminAnalytics = () => {
     const [stats, setStats] = useState({ packages: 0, testimonials: 0, services: 0 });
+    const [activeVisitors, setActiveVisitors] = useState(142);
+
+    useEffect(() => {
+        // Mock real-time visitor fluctuation
+        const interval = setInterval(() => {
+            setActiveVisitors(prev => {
+                const change = Math.floor(Math.random() * 5) - 2; // -2 to +2
+                return Math.max(10, prev + change);
+            });
+        }, 3000);
+        return () => clearInterval(interval);
+    }, []);
 
     useEffect(() => {
         const fetchStats = async () => {
             try {
                 const [pkgRes, testRes, srvRes] = await Promise.all([
-                    axios.get('http://localhost:5000/api/packages').catch(() => ({ data: [] })),
-                    axios.get('http://localhost:5000/api/testimonials').catch(() => ({ data: [] })),
-                    axios.get('http://localhost:5000/api/features').catch(() => ({ data: [] }))
+                    axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/packages`).catch(() => ({ data: [] })),
+                    axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/testimonials`).catch(() => ({ data: [] })),
+                    axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/features`).catch(() => ({ data: [] }))
                 ]);
                 setStats({
                     packages: pkgRes.data.length,
@@ -68,6 +81,13 @@ const AdminAnalytics = () => {
         { name: 'Jun', views: 2390, inquiries: 380 },
     ];
 
+    const pieData = [
+        { name: 'Tour Packages', value: 45 },
+        { name: 'Cruise Packages', value: 30 },
+        { name: 'South India', value: 25 },
+    ];
+    const COLORS = ['#2B4560', '#3B82F6', '#10B981'];
+
     const recentInquiries = [
         { id: 1, name: 'Alice Smith', package: 'Bali Paradise', date: '2 hours ago', status: 'New' },
         { id: 2, name: 'John Doe', package: 'European Tour', date: '5 hours ago', status: 'Contacted' },
@@ -76,9 +96,22 @@ const AdminAnalytics = () => {
 
     return (
         <div className="space-y-8 animate-in fade-in duration-300">
-            <div>
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white">Dashboard Overview</h3>
-                <p className="text-gray-500 dark:text-gray-400 mt-1">Welcome back! Here's a snapshot of your database and website traffic.</p>
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h3 className="text-2xl font-bold text-gray-900 dark:text-white">Dashboard Overview</h3>
+                    <p className="text-gray-500 dark:text-gray-400 mt-1">Welcome back! Here's a snapshot of your database and website traffic.</p>
+                </div>
+                <div className="flex items-center gap-3 bg-white dark:bg-gray-800 px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
+                    <div className="relative">
+                        <Users size={20} className="text-blue-600 dark:text-blue-400" />
+                        <span className="absolute -top-1 -right-1 w-2 h-2 bg-green-500 rounded-full animate-ping"></span>
+                        <span className="absolute -top-1 -right-1 w-2 h-2 bg-green-500 rounded-full"></span>
+                    </div>
+                    <div>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 font-semibold uppercase tracking-wider">Active Users Now</p>
+                        <p className="text-xl font-bold text-gray-900 dark:text-white leading-none">{activeVisitors}</p>
+                    </div>
+                </div>
             </div>
 
             {/* KPI Cards */}
@@ -91,10 +124,10 @@ const AdminAnalytics = () => {
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Traffic Chart */}
-                <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden p-6">
+                <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden p-6 flex flex-col">
                     <h4 className="font-bold text-gray-900 dark:text-white mb-6">Traffic & Inquiries (Last 6 Months)</h4>
-                    <div className="h-64">
-                        <ResponsiveContainer width="99%" height="100%" minHeight={250}>
+                    <div className="flex-1 min-h-[250px]">
+                        <ResponsiveContainer width="99%" height="100%">
                             <BarChart data={chartData} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
                                 <XAxis dataKey="name" axisLine={false} tickLine={false} />
@@ -107,28 +140,60 @@ const AdminAnalytics = () => {
                     </div>
                 </div>
 
-                {/* Quick Actions / System Health */}
-                <div className="bg-gradient-to-br from-[#2B4560] to-[#1f3246] rounded-2xl p-6 text-white shadow-md relative overflow-hidden flex flex-col justify-between">
-                    <div className="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-white opacity-5 rounded-full blur-3xl"></div>
-                    <div>
-                        <h4 className="font-bold text-lg mb-4 text-blue-100">Quick Actions</h4>
-                        <div className="space-y-3 relative z-10">
-                            <button className="w-full bg-white/10 hover:bg-white/20 text-left px-4 py-3 rounded-xl transition-colors font-medium text-sm flex items-center justify-between border border-white/5">
-                                Add New Package <PackageSearch size={16} />
-                            </button>
-                            <button className="w-full bg-white/10 hover:bg-white/20 text-left px-4 py-3 rounded-xl transition-colors font-medium text-sm flex items-center justify-between border border-white/5">
-                                Update Header Image <ImageIcon size={16} />
-                            </button>
-                            <button className="w-full bg-white/10 hover:bg-white/20 text-left px-4 py-3 rounded-xl transition-colors font-medium text-sm flex items-center justify-between border border-white/5">
-                                View Full Analytics <TrendingUp size={16} />
-                            </button>
+                <div className="space-y-6">
+                    {/* Pie Chart for Package Categories */}
+                    <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden p-6">
+                        <h4 className="font-bold text-gray-900 dark:text-white mb-2">Inquiries by Category</h4>
+                        <div className="h-[200px]">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <PieChart>
+                                    <Pie
+                                        data={pieData}
+                                        cx="50%"
+                                        cy="50%"
+                                        innerRadius={60}
+                                        outerRadius={80}
+                                        paddingAngle={5}
+                                        dataKey="value"
+                                    >
+                                        {pieData.map((entry, index) => (
+                                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                        ))}
+                                    </Pie>
+                                    <Tooltip contentStyle={{ borderRadius: '10px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
+                                </PieChart>
+                            </ResponsiveContainer>
+                        </div>
+                        <div className="flex justify-center gap-4 mt-2">
+                            {pieData.map((entry, index) => (
+                                <div key={entry.name} className="flex items-center gap-1 text-xs text-gray-600 dark:text-gray-300">
+                                    <span className="w-2 h-2 rounded-full" style={{ backgroundColor: COLORS[index] }}></span>
+                                    {entry.name}
+                                </div>
+                            ))}
                         </div>
                     </div>
-                    
-                    <div className="mt-8 pt-6 border-t border-white/10 flex items-center justify-between">
-                        <div className="text-sm">
-                            <p className="text-blue-200">System Status</p>
-                            <p className="font-bold text-green-400 flex items-center gap-1 mt-1"><span className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span> All Systems Operational</p>
+
+                    {/* Quick Actions / System Health */}
+                    <div className="bg-gradient-to-br from-[#2B4560] to-[#1f3246] rounded-2xl p-6 text-white shadow-md relative overflow-hidden flex flex-col justify-between h-[250px]">
+                        <div className="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-white opacity-5 rounded-full blur-3xl"></div>
+                        <div>
+                            <h4 className="font-bold text-lg mb-4 text-blue-100">Quick Actions</h4>
+                            <div className="space-y-3 relative z-10">
+                                <button className="w-full bg-white/10 hover:bg-white/20 text-left px-4 py-2.5 rounded-xl transition-colors font-medium text-sm flex items-center justify-between border border-white/5">
+                                    Add New Package <PackageSearch size={16} />
+                                </button>
+                                <button className="w-full bg-white/10 hover:bg-white/20 text-left px-4 py-2.5 rounded-xl transition-colors font-medium text-sm flex items-center justify-between border border-white/5">
+                                    Update Header Image <ImageIcon size={16} />
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div className="mt-4 pt-4 border-t border-white/10 flex items-center justify-between">
+                            <div className="text-sm">
+                                <p className="text-blue-200">System Status</p>
+                                <p className="font-bold text-green-400 flex items-center gap-1 mt-1"><span className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span> All Systems Operational</p>
+                            </div>
                         </div>
                     </div>
                 </div>

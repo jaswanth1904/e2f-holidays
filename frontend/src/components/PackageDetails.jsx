@@ -1,17 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { MapPin, Calendar as CalendarIcon, Anchor, CheckCircle, XCircle, Info, ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react';
+import { MapPin, Calendar as CalendarIcon, Anchor, CheckCircle, XCircle, Info, ArrowLeft, ChevronDown, ChevronUp, Hotel, Car, Utensils, Camera, Clock } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { Helmet } from 'react-helmet-async';
 
 const PackageDetails = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const [pkgData, setPkgData] = useState(null);
     const [loading, setLoading] = useState(true);
-
-    // Calendar State
-    const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
-    const [currentMonth, setCurrentMonth] = useState(new Date());
+    const [openDay, setOpenDay] = useState(1);
 
     useEffect(() => {
         const loadPackage = async () => {
@@ -30,9 +28,9 @@ const PackageDetails = () => {
                 if (found) {
                     setPkgData(found);
                 } else {
-                    const res = await fetch('/api/packages');
+                    const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/packages`);
                     const allData = await res.json();
-                    const apiFound = allData.find(p => p.id === id);
+                    const apiFound = allData.find(p => p.id === id || p._id === id);
                     if (apiFound) setPkgData(apiFound);
                 }
             } catch (err) {
@@ -61,45 +59,21 @@ const PackageDetails = () => {
         );
     }
 
-    const getDaysInMonth = (date) => {
-        const year = date.getFullYear();
-        const month = date.getMonth();
-        const daysInMonth = new Date(year, month + 1, 0).getDate();
-        const firstDay = new Date(year, month, 1).getDay();
-        const daysArray = [];
-        for (let i = 0; i < firstDay; i++) daysArray.push(null);
-        for (let i = 1; i <= daysInMonth; i++) daysArray.push(new Date(year, month, i));
-        return daysArray;
-    };
-
-    const isDateSelectable = (date) => {
-        if (!date) return false;
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        return date >= today;
-    };
-
-    const changeMonth = (increment) => {
-        const newDate = new Date(currentMonth);
-        newDate.setMonth(newDate.getMonth() + increment);
-        setCurrentMonth(newDate);
-    };
-
-    // Normalize data if it's a South India package (missing detailed fields)
-    const pkg = pkgData?.itinerary ? pkgData : {
+    // Normalize data to ensure all fields exist
+    const pkg = {
         ...pkgData,
-        dateRange: "Flexible Dates",
-        ship: "Private Vehicle",
-        route: pkgData?.destinations?.join(" → "),
-        itinerary: pkgData?.destinations?.map((dest, i) => ({
+        dateRange: pkgData?.dateRange || "Flexible Dates",
+        ship: pkgData?.ship || "Private Vehicle",
+        route: pkgData?.route || pkgData?.destinations?.join(" → "),
+        itinerary: pkgData?.itinerary || pkgData?.destinations?.map((dest, i) => ({
             day: i + 1,
             port: dest,
             activity: `Explore the beautiful attractions and local culture of ${dest}. Overnight stay.`
         })) || [],
-        inclusions: ["Premium Hotel Accommodation", "Daily Breakfast & Dinner", "AC Private Vehicle for Sightseeing", "All Tolls, Parking & Driver Bata"],
-        shows: ["Traditional Cultural Performance", "Local Sightseeing Tours"],
-        safetyOptions: ["Sanitized Cab", "Verified Drivers", "24/7 Support"],
-        otherDetails: "Entry fees to monuments not included in standard package cost."
+        inclusions: pkgData?.inclusions || ["Premium Hotel Accommodation", "Daily Breakfast & Dinner", "AC Private Vehicle for Sightseeing", "All Tolls, Parking & Driver Bata"],
+        shows: pkgData?.shows || ["Traditional Cultural Performance", "Local Sightseeing Tours"],
+        safetyOptions: pkgData?.safetyOptions || ["Sanitized Cab", "Verified Drivers", "24/7 Support"],
+        otherDetails: pkgData?.otherDetails || "Entry fees to monuments not included in standard package cost."
     };
 
     if (!pkg) {
@@ -114,259 +88,301 @@ const PackageDetails = () => {
     }
 
     return (
-        <div className="pt-24 min-h-screen bg-gray-50 dark:bg-black text-gray-900 dark:text-white pb-20">
-            {/* Header Section */}
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
-                <button
-                    onClick={() => {
-                        const isSouthIndia = !!pkgData?.destinations;
-                        navigate(isSouthIndia ? '/#south-india' : '/#packages');
-                    }}
-                    className="flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-brand-blue dark:text-gray-400 dark:hover:text-white mb-4 transition-colors group"
-                >
-                    <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" /> Back
-                </button>
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-gray-200 dark:border-gray-800 pb-6">
-                    <div>
-                        <h1 className="text-2xl md:text-3xl font-bold text-brand-blue mb-2">
+        <>
+            <Helmet>
+                <title>{`${pkg.title} - E2F Holidays`}</title>
+                <meta name="description" content={pkg.description} />
+                <meta property="og:title" content={`${pkg.title} - E2F Holidays`} />
+                <meta property="og:description" content={pkg.description} />
+                <meta property="og:image" content={pkg.image} />
+                <script type="application/ld+json">
+                    {`
+                        {
+                            "@context": "https://schema.org",
+                            "@type": "TouristTrip",
+                            "name": "${pkg.title}",
+                            "description": "${pkg.description}",
+                            "provider": {
+                                "@type": "TravelAgency",
+                                "name": "E2F Holidays"
+                            },
+                            "offers": {
+                                "@type": "Offer",
+                                "price": "${pkg.price || 0}",
+                                "priceCurrency": "INR"
+                            }
+                        }
+                    `}
+                </script>
+            </Helmet>
+            <div className="min-h-screen bg-[#F5F7FA] dark:bg-black text-gray-900 dark:text-white pb-20 font-sans pt-16 md:pt-20">
+                {/* Hero Section */}
+            <div className="relative h-[300px] md:h-[450px] w-full">
+                <img src={pkg.image} alt={pkg.title} className="w-full h-full object-cover" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/10 flex flex-col justify-end pb-8 md:pb-12">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+                        {/* Back button removed as requested */}
+                        <div className="flex flex-wrap items-center gap-3 mb-3 pt-8">
+                            <span className="bg-brand-blue text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm">{pkg.duration}</span>
+                            <span className="bg-brand-teal text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm">{pkg.destination}</span>
+                        </div>
+                        <h1 className="text-3xl md:text-5xl font-black text-white leading-tight mb-3 drop-shadow-lg">
                             {pkg.title}
                         </h1>
-                        <div className="flex flex-wrap gap-4 text-sm text-gray-600 dark:text-gray-400">
-                            <span className="flex items-center gap-1"><Anchor className="w-4 h-4" /> {pkg.ship}</span>
-                            <span className="flex items-center gap-1"><CalendarIcon className="w-4 h-4" /> {pkg.dateRange || "Flexible Dates"}</span>
-                            <span className="flex items-center gap-1"><MapPin className="w-4 h-4" /> {pkg.route}</span>
-                        </div>
-                    </div>
-                    <div className="mt-4 md:mt-0 text-right">
-                        <p className="text-lg font-medium text-gray-600 dark:text-gray-300 mb-2">Interested in this experience?</p>
-                        <a
-                            href={`https://wa.me/919642810644?text=${encodeURIComponent(`Hi, I'm interested in the ${pkg.title} package. Please share details.`)}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-block mt-2 bg-gradient-to-r from-[#25D366] to-[#128C7E] hover:from-[#128C7E] hover:to-[#075E54] text-white px-8 py-3 rounded-md font-semibold transition-all shadow-lg hover:shadow-xl"
-                        >
-                            WhatsApp for Best Price
-                        </a>
+                        <p className="text-base md:text-lg text-gray-200 max-w-3xl line-clamp-2 md:line-clamp-none drop-shadow-sm">{pkg.description}</p>
                     </div>
                 </div>
             </div>
 
             {/* Main Content Grid */}
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
-
-                {/* Left Column: Itinerary */}
-                <div className="lg:col-span-2 space-y-8">
-                    {/* Image */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="rounded-xl overflow-hidden shadow-2xl h-64 md:h-96 w-full relative"
-                    >
-                        <img src={pkg.image} alt={pkg.title} className="w-full h-full object-cover" />
-                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6">
-                            <h3 className="text-white text-xl font-bold">{pkg.duration} Journey</h3>
-                        </div>
-                    </motion.div>
-
-                    {/* Itinerary Timeline */}
-                    <div className="bg-white dark:bg-gray-900 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-800">
-                        <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
-                            <CalendarIcon className="w-5 h-5 text-brand-blue" /> Day Wise Itinerary
-                        </h2>
-                        <div className="space-y-8 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-slate-300 before:to-transparent">
-                            {pkg.itinerary.map((item, index) => (
-                                <div key={index} className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
-                                    <div className="flex items-center justify-center w-10 h-10 rounded-full border border-white bg-slate-300 group-[.is-active]:bg-brand-blue text-slate-500 group-[.is-active]:text-emerald-50 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
-                                        <span className="font-bold">{item.day}</span>
-                                    </div>
-                                    <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 rounded-xl border border-slate-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm">
-                                        <div className="flex items-center justify-between space-x-2 mb-1">
-                                            <div className="font-bold text-slate-900 dark:text-white">{item.port}</div>
-                                        </div>
-                                        <div className="text-slate-500 dark:text-gray-400 text-sm">
-                                            {item.activity}
-                                        </div>
-                                    </div>
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8">
+                
+                {/* Left Column (Content) */}
+                <div className="lg:col-span-8 space-y-6 md:space-y-8">
+                    {/* Key Info Banner */}
+                    <div className="bg-white dark:bg-gray-900 rounded-2xl p-6 shadow-xl border border-gray-100 dark:border-gray-800">
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-4 divide-y sm:divide-y-0 sm:divide-x divide-gray-200 dark:divide-gray-700">
+                            {/* Departure */}
+                            <div className="flex flex-col sm:items-center sm:text-center pt-2 sm:pt-0">
+                                <div className="bg-blue-50 dark:bg-blue-900/30 w-12 h-12 flex items-center justify-center rounded-full text-brand-blue dark:text-blue-400 mb-3 sm:mx-auto">
+                                    <CalendarIcon size={24} />
                                 </div>
-                            ))}
-                        </div>
-                    </div>
-                    {/* Other Details */}
-                    {pkg.otherDetails && (
-                        <div className="bg-white dark:bg-gray-900 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-800">
-                            <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-                                Important Information
-                            </h2>
-                            <div className="prose dark:prose-invert max-w-none text-sm text-gray-600 dark:text-gray-300">
-                                <p className="whitespace-pre-line">{pkg.otherDetails}</p>
-                            </div>
-                        </div>
-                    )}
-                </div>
-
-                {/* Right Column: Inclusions & Shows & Trust */}
-                <div className="space-y-6">
-                    {/* Travel Dates Selection */}
-                    <div className="bg-white dark:bg-gray-900 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-800">
-                        <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
-                            <CalendarIcon className="w-5 h-5 text-brand-blue" /> Select Travel Date
-                        </h3>
-
-                        {/* Compact Calendar */}
-                        <div className="bg-gray-50 dark:bg-gray-800/50 rounded-2xl p-4 border border-gray-100 dark:border-gray-800/50">
-                            <div className="flex justify-between items-center mb-4">
-                                <button onClick={() => changeMonth(-1)} className="p-1.5 hover:bg-white dark:hover:bg-gray-700 rounded-full transition-colors">
-                                    <ChevronLeft size={16} />
-                                </button>
-                                <span className="font-bold text-sm">
-                                    {currentMonth.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
-                                </span>
-                                <button onClick={() => changeMonth(1)} className="p-1.5 hover:bg-white dark:hover:bg-gray-700 rounded-full transition-colors">
-                                    <ChevronRight size={16} />
-                                </button>
+                                <p className="text-xs text-gray-500 uppercase font-bold tracking-wider mb-1">Departure</p>
+                                <p className="font-bold text-gray-900 dark:text-white">{pkg.dateRange || "Flexible Dates"}</p>
                             </div>
 
-                            <div className="grid grid-cols-7 gap-1 text-center mb-2">
-                                {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((d, i) => (
-                                    <span key={`${d}-${i}`} className="text-[10px] text-gray-400 font-bold uppercase">{d}</span>
-                                ))}
+                            {/* Route */}
+                            <div className="flex flex-col sm:items-center sm:text-center pt-6 sm:pt-0">
+                                <div className="bg-teal-50 dark:bg-teal-900/30 w-12 h-12 flex items-center justify-center rounded-full text-brand-teal dark:text-teal-400 mb-3 sm:mx-auto">
+                                    <MapPin size={24} />
+                                </div>
+                                <p className="text-xs text-gray-500 uppercase font-bold tracking-wider mb-1">Route</p>
+                                <p className="font-bold text-gray-900 dark:text-white leading-tight">
+                                    {pkg.route}
+                                </p>
                             </div>
 
-                            <div className="grid grid-cols-7 gap-1">
-                                {getDaysInMonth(currentMonth).map((day, idx) => {
-                                    const isSelected = day && day.toISOString().split('T')[0] === selectedDate;
-                                    const selectable = isDateSelectable(day);
-
-                                    return (
-                                        <div key={idx} className="aspect-square flex items-center justify-center">
-                                            {day && (
-                                                <button
-                                                    disabled={!selectable}
-                                                    onClick={() => {
-                                                        const offsetDate = new Date(day.getTime() - (day.getTimezoneOffset() * 60000));
-                                                        setSelectedDate(offsetDate.toISOString().split('T')[0]);
-                                                    }}
-                                                    className={`w-7 h-7 rounded-full text-[10px] font-bold flex items-center justify-center transition-all duration-200 relative
-                                                        ${isSelected
-                                                            ? 'bg-brand-blue text-white shadow-md'
-                                                            : selectable
-                                                                ? 'text-gray-700 dark:text-gray-300 hover:bg-brand-blue/10 hover:text-brand-blue'
-                                                                : 'text-gray-400 dark:text-gray-600 cursor-not-allowed opacity-40'}
-                                                    `}
-                                                >
-                                                    <span className={!selectable ? 'line-through opacity-50' : ''}>
-                                                        {day.getDate()}
-                                                    </span>
-                                                </button>
-                                            )}
-                                        </div>
-                                    );
-                                })}
+                            {/* Transport */}
+                            <div className="flex flex-col sm:items-center sm:text-center pt-6 sm:pt-0">
+                                <div className="bg-orange-50 dark:bg-orange-900/30 w-12 h-12 flex items-center justify-center rounded-full text-brand-yellow dark:text-yellow-500 mb-3 sm:mx-auto">
+                                    <Anchor size={24} />
+                                </div>
+                                <p className="text-xs text-gray-500 uppercase font-bold tracking-wider mb-1">Transport</p>
+                                <p className="font-bold text-gray-900 dark:text-white leading-tight">
+                                    {pkg.ship}
+                                </p>
                             </div>
-                        </div>
-
-                        <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between">
-                            <span className="text-xs text-gray-500 font-medium uppercase tracking-wider">Date:</span>
-                            <span className="text-xs font-bold text-brand-blue">
-                                {new Date(selectedDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
-                            </span>
                         </div>
                     </div>
 
-                    {/* Seamless Journey Trust Builder */}
-                    <div className="bg-gradient-to-br from-brand-blue/5 to-white dark:from-gray-900 dark:to-gray-800 rounded-xl p-6 shadow-sm border border-brand-blue/10 dark:border-gray-700">
-                        <h3 className="text-lg font-bold mb-4 text-brand-blue flex items-center gap-2">
-                            <CheckCircle className="w-5 h-5" /> End-to-End Service
-                        </h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-300 mb-6">
-                            We handle everything from your doorstep to the destination.
+                    {/* We Take Care Of You Section */}
+                    <div className="bg-white dark:bg-gray-900 rounded-2xl p-6 md:p-8 shadow-sm border border-gray-100 dark:border-gray-800">
+                        <div className="flex items-center gap-3 mb-6 border-b border-gray-100 dark:border-gray-800 pb-4">
+                            <CheckCircle className="w-8 h-8 text-green-500" />
+                            <h3 className="text-2xl font-black text-gray-900 dark:text-white tracking-wide">We Take Care of You!</h3>
+                        </div>
+                        <p className="text-sm md:text-base text-gray-600 dark:text-gray-300 mb-8 leading-relaxed font-medium">
+                            From the moment you book until you return home with unforgettable memories, our dedicated team handles every detail. Your comfort and safety are our top priorities.
                         </p>
-                        <div className="flex justify-between items-center text-gray-500 dark:text-gray-400 relative">
-                            {/* Connector Line */}
-                            <div className="absolute top-1/2 left-0 w-full h-0.5 bg-gray-200 dark:bg-gray-700 -z-10 transform -translate-y-1/2"></div>
-
-                            <div className="flex flex-col items-center bg-white dark:bg-gray-800 p-2 rounded-full z-10">
-                                <MapPin className="w-5 h-5 text-brand-teal mb-1" />
-                                <span className="text-[10px] font-bold uppercase">Home</span>
+                        
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                            <div className="flex flex-col items-center text-center p-4 bg-blue-50 dark:bg-blue-900/10 rounded-xl hover:scale-105 transition-transform">
+                                <Hotel className="w-10 h-10 text-brand-blue mb-3" />
+                                <h4 className="font-bold text-gray-900 dark:text-white text-sm mb-1">Premium Stays</h4>
+                                <p className="text-xs text-gray-500 dark:text-gray-400">Handpicked 4 & 5-star accommodations.</p>
                             </div>
-                            <div className="flex flex-col items-center bg-white dark:bg-gray-800 p-2 rounded-full z-10">
-                                <motion.div animate={{ x: [0, 5, 0] }} transition={{ repeat: Infinity, duration: 2 }}>
-                                    <div className="w-5 h-5 text-brand-blue">🚙</div> {/* Car Emoji as icon substitute or use Car from lucide if imported */}
-                                </motion.div>
-                                <span className="text-[10px] font-bold uppercase">Cab</span>
+                            <div className="flex flex-col items-center text-center p-4 bg-teal-50 dark:bg-teal-900/10 rounded-xl hover:scale-105 transition-transform">
+                                <Car className="w-10 h-10 text-brand-teal mb-3" />
+                                <h4 className="font-bold text-gray-900 dark:text-white text-sm mb-1">Seamless Transfers</h4>
+                                <p className="text-xs text-gray-500 dark:text-gray-400">AC Vehicles & experienced drivers.</p>
                             </div>
-                            <div className="flex flex-col items-center bg-white dark:bg-gray-800 p-2 rounded-full z-10">
-                                <Anchor className="w-5 h-5 text-brand-red mb-1" />
-                                <span className="text-[10px] font-bold uppercase">Cruise</span>
+                            <div className="flex flex-col items-center text-center p-4 bg-orange-50 dark:bg-orange-900/10 rounded-xl hover:scale-105 transition-transform">
+                                <Camera className="w-10 h-10 text-brand-yellow mb-3" />
+                                <h4 className="font-bold text-gray-900 dark:text-white text-sm mb-1">Guided Sightseeing</h4>
+                                <p className="text-xs text-gray-500 dark:text-gray-400">Expert guides & scenic routes covered.</p>
                             </div>
-                        </div>
-                    </div>
-
-                    {/* Trust & Contact Box (Namaste) */}
-                    <div className="bg-white dark:bg-gray-900 rounded-xl overflow-hidden shadow-lg border border-gray-100 dark:border-gray-800 relative group">
-                        <div className="h-48 overflow-hidden relative">
-                            <img
-                                src="https://www.amle.org/wp-content/uploads/2021/02/784784p888EDNmain1084iStock-962787224.jpg"
-                                alt="Namaste - Welcome"
-                                className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-6">
-                                <h3 className="text-white font-bold text-xl italic font-script">"Namaskaram"</h3>
-                            </div>
-                        </div>
-                        <div className="p-6 text-center">
-                            <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
-                                Our experts are here to help you plan the perfect getaway. We are just a call away.
-                            </p>
-                            <div className="space-y-3">
-                                <a href="https://wa.me/919642810644" target="_blank" rel="noopener noreferrer" className="block w-full py-3 rounded-lg bg-[#25D366] text-white font-bold flex items-center justify-center gap-2 hover:bg-[#128C7E] transition-colors shadow-lg">
-                                    <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M12.031 6.172c-2.31 0-4.191 1.881-4.191 4.192 0 .61.131 1.189.365 1.714l-.45 1.642 1.685-.442c.504.209 1.057.324 1.591.324 2.31 0 4.191-1.881 4.191-4.192s-1.881-4.192-4.191-4.192zm3.322 5.923c-.15.209-.851.815-1.168.815-.316 0-.622-.053-1.096-.242-.473-.188-1.042-.416-1.503-.844-.462-.428-.737-.806-.931-1.127-.193-.321-.193-.54-.15-.75.043-.209.15-.321.225-.428.075-.107.13-.188.13-.188s.023-.043.037-.064c.014-.022.023-.053.023-.085 0-.032-.014-.064-.037-.085-.022-.022-.13-.321-.183-.448-.052-.128-.106-.246-.15-.321-.044-.075-.084-.107-.13-.107-.045 0-.083.011-.132.043-.047.032-.214.209-.214.509 0 .299.219.589.247.632.028.043.432.664 1.046 1.127.615.463 1.139.632 1.536.685.397.054.76.043 1.046.011.286-.032.873-.357 1.002-.697.129-.339.129-.631.09-.696-.038-.065-.13-.107-.272-.177zM12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm.019 18.298c-1.171 0-2.31-.299-3.322-.862l-3.322.873.884-3.238c-.622-1.066-.95-2.285-.95-3.53s.328-2.464.95-3.53l-.884-3.238 3.322.873c1.012-.563 2.151-.862 3.322-.862 3.737 0 6.777 3.04 6.777 6.777s-3.04 6.777-6.777 6.777z" /></svg>
-                                    WhatsApp Now
-                                </a>
-                                <a href="mailto:e2fhoildays@gmail.com" className="block w-full py-3 rounded-lg border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-white font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors flex items-center justify-center gap-2">
-                                    📩 Email for Booking
-                                </a>
+                            <div className="flex flex-col items-center text-center p-4 bg-green-50 dark:bg-green-900/10 rounded-xl hover:scale-105 transition-transform">
+                                <Utensils className="w-10 h-10 text-green-500 mb-3" />
+                                <h4 className="font-bold text-gray-900 dark:text-white text-sm mb-1">Delicious Meals</h4>
+                                <p className="text-xs text-gray-500 dark:text-gray-400">Daily breakfast & dinner included.</p>
                             </div>
                         </div>
                     </div>
 
-                    {/* Inclusions Card - Sticky */}
-                    <div className="bg-white dark:bg-gray-900 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-800 sticky top-24">
-                        <h3 className="text-lg font-bold mb-4">Inclusions</h3>
-                        <ul className="space-y-3">
-                            {pkg.inclusions.map((inc, i) => (
-                                <li key={i} className="flex items-start gap-3 text-sm text-gray-600 dark:text-gray-300">
-                                    <CheckCircle className="w-5 h-5 text-brand-teal shrink-0" />
-                                    <span>{inc}</span>
-                                </li>
-                            ))}
-                        </ul>
-
-                        <div className="mt-8">
-                            <h3 className="text-lg font-bold mb-4">Entertainment Shows</h3>
-                            <div className="bg-gray-50 dark:bg-gray-800 rounded-lg overflow-hidden">
-                                {pkg.shows.map((show, i) => (
-                                    <div key={i} className="flex justify-between items-center p-3 border-b border-gray-200 dark:border-gray-700 last:border-0">
-                                        <span className="text-sm font-medium">{show}</span>
-                                        <CheckCircle className="w-4 h-4 text-brand-teal" />
+                    {/* Itinerary */}
+                    <div className="bg-white dark:bg-gray-900 rounded-2xl p-6 md:p-8 shadow-sm border border-gray-100 dark:border-gray-800">
+                        <h2 className="text-2xl font-black mb-2 text-gray-900 dark:text-white flex items-center gap-3">
+                            <CalendarIcon className="w-6 h-6 text-brand-blue" /> Day Wise Itinerary in Detail
+                        </h2>
+                        <p className="text-sm text-gray-500 mb-8 border-b border-gray-100 dark:border-gray-800 pb-4">
+                            Explore your detailed day-by-day plan with scenic highlights.
+                        </p>
+                        <div className="space-y-4">
+                            {pkg.itinerary.map((item, index) => {
+                                const isOpen = openDay === item.day;
+                                return (
+                                    <div key={index} className={`border rounded-xl transition-all duration-300 ${isOpen ? 'border-brand-blue shadow-md' : 'border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700'}`}>
+                                        <button 
+                                            onClick={() => setOpenDay(isOpen ? null : item.day)}
+                                            className="w-full flex items-center justify-between p-4 sm:p-5 text-left focus:outline-none"
+                                        >
+                                            <div className="flex items-center gap-4">
+                                                <div className={`w-10 h-10 rounded-full flex flex-col items-center justify-center font-black transition-colors ${isOpen ? 'bg-brand-blue text-white' : 'bg-blue-50 dark:bg-gray-800 text-brand-blue dark:text-gray-300'}`}>
+                                                    <span className="text-[9px] uppercase leading-none mt-1">Day</span>
+                                                    <span className="leading-none">{item.day}</span>
+                                                </div>
+                                                <h4 className={`text-lg font-bold ${isOpen ? 'text-brand-blue' : 'text-gray-900 dark:text-white'}`}>
+                                                    {item.port}
+                                                </h4>
+                                            </div>
+                                            <div className="text-gray-400 shrink-0">
+                                                {isOpen ? <ChevronUp className="w-6 h-6 text-brand-blue" /> : <ChevronDown className="w-6 h-6" />}
+                                            </div>
+                                        </button>
+                                        
+                                        {/* Accordion Content */}
+                                        <div className={`overflow-hidden transition-all duration-500 ease-in-out ${isOpen ? 'max-h-[1500px] opacity-100' : 'max-h-0 opacity-0'}`}>
+                                            <div className="p-4 sm:p-5 pt-0 sm:pl-16 relative">
+                                                <div className="hidden sm:block absolute left-8 top-0 bottom-0 w-0.5 bg-gray-200 dark:bg-gray-800 -z-10"></div>
+                                                <div className="bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 rounded-2xl p-5 border border-gray-100 dark:border-gray-800 shadow-sm relative transform origin-top transition-transform duration-500">
+                                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                                        <div className="md:col-span-2 space-y-4">
+                                                            <div className="flex flex-col gap-1 mb-2">
+                                                                <h5 className="font-black text-xl text-gray-900 dark:text-white">{item.port}</h5>
+                                                                <p className="text-xs text-brand-blue dark:text-blue-400 font-bold tracking-wide uppercase">Featured Destination</p>
+                                                            </div>
+                                                            <div className="flex items-center gap-2 text-brand-blue dark:text-blue-400 mt-4 border-t border-gray-200 dark:border-gray-700 pt-4">
+                                                                <MapPin size={18} />
+                                                                <h6 className="font-bold uppercase tracking-wider text-xs">Location Details</h6>
+                                                            </div>
+                                                            <p className="text-gray-700 dark:text-gray-300 leading-relaxed font-medium text-sm md:text-base">
+                                                                {item.activity}
+                                                            </p>
+                                                        </div>
+                                                        <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl border border-blue-100 dark:border-blue-900/50 flex flex-col justify-center h-fit space-y-3">
+                                                            <div className="flex items-center gap-2 text-brand-teal">
+                                                                <Clock size={16} />
+                                                                <span className="font-bold text-xs uppercase tracking-wider">Best Time</span>
+                                                            </div>
+                                                            <p className="font-bold text-gray-900 dark:text-white text-sm">
+                                                                Early Morning to Evening
+                                                            </p>
+                                                            <div className="w-full h-px bg-blue-200 dark:bg-blue-800"></div>
+                                                            <div className="flex items-center gap-2 text-brand-yellow">
+                                                                <Info size={16} />
+                                                                <span className="font-bold text-xs uppercase tracking-wider">Highlight</span>
+                                                            </div>
+                                                            <p className="font-semibold text-gray-700 dark:text-gray-300 text-sm">
+                                                                Scenic views & photography
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
-                                ))}
-                                <div className="flex justify-between items-center p-3 text-gray-400">
-                                    <span className="text-sm">Personal Laundry</span>
-                                    <XCircle className="w-4 h-4 text-brand-red" />
-                                </div>
-                            </div>
+                                );
+                            })}
                         </div>
+                    </div>
 
-                        <div className="mt-6 pt-6 border-t border-gray-100 dark:border-gray-800">
-                            <Link to="/contact" className="block w-full text-center bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-900 dark:text-white py-3 rounded-lg font-medium transition-colors">
-                                Request a Call
-                            </Link>
+                    {/* Inclusions & Details */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="bg-white dark:bg-gray-900 rounded-2xl p-6 md:p-8 shadow-sm border border-gray-100 dark:border-gray-800 h-full">
+                            <h3 className="text-xl font-black mb-6 flex items-center gap-2">
+                                <CheckCircle className="w-5 h-5 text-green-500" /> What's Included
+                            </h3>
+                            <ul className="space-y-4">
+                                {pkg.inclusions.map((inc, i) => (
+                                    <li key={i} className="flex items-start gap-3 text-sm md:text-base text-gray-700 dark:text-gray-300 font-medium">
+                                        <CheckCircle className="w-5 h-5 text-green-500 shrink-0 mt-0.5" />
+                                        <span>{inc}</span>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                        <div className="bg-white dark:bg-gray-900 rounded-2xl p-6 md:p-8 shadow-sm border border-gray-100 dark:border-gray-800 h-full">
+                            <h3 className="text-xl font-black mb-6 flex items-center gap-2">
+                                <Info className="w-5 h-5 text-brand-teal" /> Experiences / Notes
+                            </h3>
+                            <ul className="space-y-4">
+                                {pkg.shows.map((show, i) => (
+                                    <li key={i} className="flex items-start gap-3 text-sm md:text-base text-gray-700 dark:text-gray-300 font-medium">
+                                        <CheckCircle className="w-5 h-5 text-brand-teal shrink-0 mt-0.5" />
+                                        <span>{show}</span>
+                                    </li>
+                                ))}
+                            </ul>
+                            {pkg.otherDetails && (
+                                <div className="mt-6 pt-6 border-t border-gray-100 dark:border-gray-800">
+                                    <p className="text-sm text-gray-500 dark:text-gray-400 italic">
+                                        {pkg.otherDetails}
+                                    </p>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
+
+                {/* Right Column (Sticky Pricing & Contact) */}
+                <div className="lg:col-span-4 mt-8 lg:mt-0">
+                    <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-800 sticky top-28 overflow-hidden">
+                        {/* Price Header Removed, Replaced with Contact Prompt */}
+                        <div className="bg-gradient-to-br from-gray-900 to-gray-800 p-8 text-white text-center relative">
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-2xl"></div>
+                            <p className="text-sm font-bold text-gray-300 uppercase tracking-widest mb-2">Want the Best Fare?</p>
+                            <h2 className="text-3xl md:text-4xl font-black text-brand-yellow drop-shadow-md">
+                                Contact Us for a Custom Quote
+                            </h2>
+                            <p className="text-xs text-gray-400 mt-3 font-medium tracking-wide">Call or WhatsApp below!</p>
+                        </div>
+                        
+                        {/* Action Buttons */}
+                        <div className="p-6 space-y-4">
+                            <a
+                                href={`tel:+919642810644`}
+                                className="flex items-center justify-center gap-3 w-full py-3.5 rounded-xl bg-brand-blue text-white font-bold text-base hover:bg-brand-dark transition-all shadow-lg shadow-brand-blue/30 group"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="group-hover:rotate-12 transition-transform"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                                Call: +91 96428 10644
+                            </a>
+
+                            <a
+                                href={`mailto:e2fhoildays@gmail.com?subject=Enquiry for ${pkg.title}&body=Hi, I would like to get more details and a quote for the ${pkg.title} package.`}
+                                className="flex items-center justify-center gap-3 w-full py-3.5 rounded-xl border-2 border-brand-blue text-brand-blue dark:text-blue-400 font-bold text-base hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all group"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="group-hover:-translate-y-1 transition-transform"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                                Email Enquiry
+                            </a>
+
+                            <a
+                                href={`https://wa.me/919642810644?text=${encodeURIComponent(`Hi, I'm interested in the ${pkg.title} package. Please share details.`)}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center justify-center gap-3 w-full py-3.5 rounded-xl bg-[#25D366] text-white font-bold text-base hover:bg-[#128C7E] transition-all shadow-lg shadow-green-500/20 group"
+                            >
+                                <svg className="w-5 h-5 fill-current group-hover:scale-110 transition-transform" viewBox="0 0 24 24"><path d="M12.031 6.172c-2.31 0-4.191 1.881-4.191 4.192 0 .61.131 1.189.365 1.714l-.45 1.642 1.685-.442c.504.209 1.057.324 1.591.324 2.31 0 4.191-1.881 4.191-4.192s-1.881-4.192-4.191-4.192zm3.322 5.923c-.15.209-.851.815-1.168.815-.316 0-.622-.053-1.096-.242-.473-.188-1.042-.416-1.503-.844-.462-.428-.737-.806-.931-1.127-.193-.321-.193-.54-.15-.75.043-.209.15-.321.225-.428.075-.107.13-.188.13-.188s.023-.043.037-.064c.014-.022.023-.053.023-.085 0-.032-.014-.064-.037-.085-.022-.022-.13-.321-.183-.448-.052-.128-.106-.246-.15-.321-.044-.075-.084-.107-.13-.107-.045 0-.083.011-.132.043-.047.032-.214.209-.214.509 0 .299.219.589.247.632.028.043.432.664 1.046 1.127.615.463 1.139.632 1.536.685.397.054.76.043 1.046.011.286-.032.873-.357 1.002-.697.129-.339.129-.631.09-.696-.038-.065-.13-.107-.272-.177zM12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm.019 18.298c-1.171 0-2.31-.299-3.322-.862l-3.322.873.884-3.238c-.622-1.066-.95-2.285-.95-3.53s.328-2.464.95-3.53l-.884-3.238 3.322.873c1.012-.563 2.151-.862 3.322-.862 3.737 0 6.777 3.04 6.777 6.777s-3.04 6.777-6.777 6.777z" /></svg>
+                                WhatsApp Now
+                            </a>
+                        </div>
+                        
+                        {/* Note & Policy */}
+                        <div className="bg-gray-50 dark:bg-gray-800 p-5 border-t border-gray-100 dark:border-gray-700 space-y-3">
+                            <p className="text-xs text-gray-500 dark:text-gray-400 flex items-start gap-2 font-medium">
+                                <Info size={16} className="text-brand-blue shrink-0 mt-0.5" /> 
+                                <span>No upfront money required to plan your trip! We only charge upon final confirmation.</span>
+                            </p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 flex items-start gap-2 font-medium">
+                                <XCircle size={16} className="text-red-400 shrink-0 mt-0.5" /> 
+                                <span>Note: Standard no-refund policy applies once the booking is finalized and confirmed.</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
             </div>
-        </div >
+            </div>
+        </>
     );
 };
 

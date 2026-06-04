@@ -18,7 +18,7 @@ const AdminFooter = () => {
 
     const fetchSettings = async () => {
         try {
-            const { data } = await axios.get('http://localhost:5000/api/settings');
+            const { data } = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/settings`);
             if (data && data.socialLinks) {
                 setFacebook(data.socialLinks.facebook || '');
                 setInstagram(data.socialLinks.instagram || '');
@@ -33,7 +33,7 @@ const AdminFooter = () => {
     const handleSave = async () => {
         try {
             const config = { headers: { Authorization: `Bearer ${admin?.token || 'fake_token'}` } };
-            await axios.put('http://localhost:5000/api/settings', { 
+            await axios.put(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/settings`, { 
                 socialLinks: { facebook, instagram, twitter },
                 copyright 
             }, config);

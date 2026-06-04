@@ -24,7 +24,7 @@ const AdminServices = () => {
 
     const fetchServices = async () => {
         try {
-            const { data } = await axios.get('http://localhost:5000/api/features');
+            const { data } = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/features`);
             setServices(data);
         } catch (error) {
             console.error(error);
@@ -53,7 +53,7 @@ const AdminServices = () => {
         formData.append('image', file);
         try {
             const config = { headers: { 'Content-Type': 'multipart/form-data', Authorization: `Bearer ${admin?.token || 'fake_token'}` } };
-            const { data } = await axios.post('http://localhost:5000/api/upload', formData, config);
+            const { data } = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/upload`, formData, config);
             setFormImagePreview(data.url);
             addToast('Image uploaded', 'success');
         } catch (error) {
@@ -73,10 +73,10 @@ const AdminServices = () => {
 
         try {
             if (currentService) {
-                await axios.put(`http://localhost:5000/api/features/${currentService}`, payload, config);
+                await axios.put(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/features/${currentService}`, payload, config);
                 addToast('Service updated successfully!', 'success');
             } else {
-                await axios.post('http://localhost:5000/api/features', payload, config);
+                await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/features`, payload, config);
                 addToast('Service added successfully!', 'success');
             }
             setIsEditing(false);
@@ -90,7 +90,7 @@ const AdminServices = () => {
     const handleDelete = async () => {
         try {
             const config = { headers: { Authorization: `Bearer ${admin?.token || 'fake_token'}` } };
-            await axios.delete(`http://localhost:5000/api/features/${deleteId}`, config);
+            await axios.delete(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/features/${deleteId}`, config);
             addToast('Service deleted!', 'success');
             setDeleteId(null);
             fetchServices();

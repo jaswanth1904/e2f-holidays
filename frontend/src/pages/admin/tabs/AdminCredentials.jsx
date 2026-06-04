@@ -7,7 +7,7 @@ const AdminCredentials = () => {
     const { admin } = useContext(AuthContext);
     const { addToast } = useToast();
     const [username, setUsername] = useState(admin?.username || 'admin');
-    const [currentPassword, setCurrentPassword] = useState('');
+    const [currentPassword, setCurrentPassword] = useState('admin123');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
 
@@ -23,7 +23,7 @@ const AdminCredentials = () => {
     };
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <h3 className="text-xl font-bold text-gray-900 dark:text-white">Admin Credentials</h3>
             <p className="text-gray-500 dark:text-gray-400">Update your login username and password for this portal.</p>
             

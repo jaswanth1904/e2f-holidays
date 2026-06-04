@@ -18,7 +18,7 @@ const AdminHero = () => {
 
     const fetchSettings = async () => {
         try {
-            const { data } = await axios.get('http://localhost:5000/api/settings');
+            const { data } = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/settings`);
             if (data) {
                 setTitle(data.heroHeading || '');
                 setSubtitle(data.heroSubheading || '');
@@ -34,7 +34,7 @@ const AdminHero = () => {
         formData.append('image', file);
         try {
             const config = { headers: { 'Content-Type': 'multipart/form-data', Authorization: `Bearer ${admin?.token || 'fake_token'}` } };
-            const { data } = await axios.post('http://localhost:5000/api/upload', formData, config);
+            const { data } = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/upload`, formData, config);
             setBgPreview(data.url);
             addToast('Hero image uploaded', 'success');
         } catch (error) {
@@ -46,7 +46,7 @@ const AdminHero = () => {
     const handleSave = async () => {
         try {
             const config = { headers: { Authorization: `Bearer ${admin?.token || 'fake_token'}` } };
-            await axios.put('http://localhost:5000/api/settings', { 
+            await axios.put(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/settings`, { 
                 heroHeading: title, 
                 heroSubheading: subtitle, 
                 heroImage: bgPreview 

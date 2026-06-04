@@ -17,7 +17,7 @@ const AdminSettings = () => {
 
     const fetchSettings = async () => {
         try {
-            const { data } = await axios.get('http://localhost:5000/api/settings');
+            const { data } = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/settings`);
             if (data) {
                 setSiteTitle(data.siteTitle || 'E2F Holidays');
             }
@@ -29,7 +29,7 @@ const AdminSettings = () => {
     const handleSave = async () => {
         try {
             const config = { headers: { Authorization: `Bearer ${admin?.token || 'fake_token'}` } };
-            await axios.put('http://localhost:5000/api/settings', { siteTitle }, config);
+            await axios.put(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/settings`, { siteTitle }, config);
             addToast('Global settings saved successfully!', 'success');
         } catch (error) {
             console.error(error);

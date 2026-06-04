@@ -234,7 +234,7 @@ const CustomerReviews = () => {
     useEffect(() => {
         const fetchTestimonials = async () => {
             try {
-                const { data } = await axios.get('http://localhost:5000/api/testimonials');
+                const { data } = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/testimonials`);
                 if (data && data.length > 0) {
                     const formattedData = data.map((t) => ({
                         id: t._id,

@@ -65,34 +65,41 @@ The backend infrastructure is hardened for robust production deployment against 
    ```sh
    git clone https://github.com/your-username/e2f-holidays.git
    cd e2f-holidays
-Backend Configuration
+   ```
 
-sh
-cd backend
-npm install
-Establish a .env file within the /backend directory:
+2. **Backend Configuration**
+   ```sh
+   cd backend
+   npm install
+   ```
+   Establish a `.env` file within the `/backend` directory:
+   ```env
+   PORT=5000
+   MONGO_URI=your_mongodb_connection_string
+   JWT_SECRET=your_secure_jwt_secret
+   CLOUDINARY_CLOUD_NAME=your_cloud_name
+   CLOUDINARY_API_KEY=your_api_key
+   CLOUDINARY_API_SECRET=your_api_secret
+   NODE_ENV=development
+   ```
+   Initialize the API server:
+   ```sh
+   npm run dev
+   ```
 
-env
-PORT=5000
-MONGO_URI=your_mongodb_connection_string
-JWT_SECRET=your_secure_jwt_secret
-CLOUDINARY_CLOUD_NAME=your_cloud_name
-CLOUDINARY_API_KEY=your_api_key
-CLOUDINARY_API_SECRET=your_api_secret
-NODE_ENV=development
-Initialize the API server:
+3. **Frontend Configuration**
+   ```sh
+   cd ../frontend
+   npm install
+   ```
+   Initialize the client development server:
+   ```sh
+   npm run dev
+   ```
 
-sh
-npm run dev
-Frontend Configuration
+4. **Access Control**: Navigate to `http://localhost:5173` for the client interface, or `http://localhost:5173/admin` to access the secure administrative portal.
 
-sh
-cd ../frontend
-npm install
-Initialize the client development server:
-
-sh
-npm run dev
-Access Control: Navigate to http://localhost:5173 for the client interface, or http://localhost:5173/admin to access the secure administrative portal.
-
-Engineered and deployed for E2F Holidays.
+---
+<div align="center">
+  <i>Engineered and deployed for E2F Holidays.</i>
+</div>

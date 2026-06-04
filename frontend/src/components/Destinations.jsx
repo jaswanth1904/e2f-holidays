@@ -45,7 +45,7 @@ const Destinations = () => {
     useEffect(() => {
         const fetchDestinations = async () => {
             try {
-                const { data } = await axios.get('http://localhost:5000/api/packages');
+                const { data } = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/packages`);
                 if (data && data.length > 0) {
                     const mappedData = data.slice(0, 3).map((pkg) => ({
                         id: pkg._id,
