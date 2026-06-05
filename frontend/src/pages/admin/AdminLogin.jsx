@@ -25,7 +25,7 @@ const AdminLogin = () => {
         try {
             const success = await login(username, password);
             if (success) {
-                navigate('/admin/dashboard');
+                navigate('/admin/dashboard', { replace: true });
             } else {
                 setError('Invalid username or password');
             }
