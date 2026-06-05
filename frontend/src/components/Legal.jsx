@@ -53,7 +53,7 @@ const Legal = () => {
                                     <li>We do not have any independent "freelance" agents collecting cash on our behalf.</li>
                                 </ul>
                                 <p className="mt-4 text-xs text-gray-500 italic">
-                                    If you encounter any suspicious activity, please immediately report it to <a href="mailto:e2fhoildays@gmail.com" className="text-brand-blue font-bold hover:underline">e2fhoildays@gmail.com</a>.
+                                    If you encounter any suspicious activity, please immediately report it to <a href="mailto:info.e2fhoildays@gmail.com" className="text-brand-blue font-bold hover:underline">info.e2fhoildays@gmail.com</a>.
                                 </p>
                             </div>
                         </section>

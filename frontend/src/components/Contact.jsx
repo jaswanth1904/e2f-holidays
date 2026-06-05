@@ -44,8 +44,8 @@ const Contact = () => {
                             </div>
                             <div>
                                 <h4 className="text-xl font-bold text-gray-900 dark:text-white mb-2 font-display">Email Us</h4>
-                                <a href="mailto:e2fhoildays@gmail.com" className="text-gray-500 dark:text-gray-400 max-w-xs block hover:text-brand-yellow transition-colors">
-                                    e2fhoildays@gmail.com
+                                <a href="mailto:info.e2fhoildays@gmail.com" className="text-gray-500 dark:text-gray-400 max-w-xs block hover:text-brand-yellow transition-colors">
+                                    info.e2fhoildays@gmail.com
                                 </a>
                             </div>
                         </div>
@@ -92,7 +92,7 @@ const Contact = () => {
                             <label className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 ml-1">Email Address</label>
                             <input
                                 type="email"
-                                value="e2fhoildays@gmail.com"
+                                value="info.e2fhoildays@gmail.com"
                                 readOnly
                                 className="w-full bg-gray-200 dark:bg-zinc-800 border border-transparent rounded-xl px-4 py-3 outline-none transition-all text-gray-600 dark:text-gray-400 cursor-not-allowed select-none"
                             />

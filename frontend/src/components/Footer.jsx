@@ -7,7 +7,7 @@ import LogoImg from '../assets/E2F Holidays Logo.png';
 const Footer = () => {
     const [settings, setSettings] = useState({
         contactPhone: '+91 96428 10644',
-        contactEmail: 'e2fhoildays@gmail.com',
+        contactEmail: 'info.e2fhoildays@gmail.com',
         socialLinks: {},
         logo: LogoImg
     });
@@ -19,7 +19,7 @@ const Footer = () => {
                 if (data) {
                     setSettings({
                         contactPhone: '+91 96428 10644', // Forced as per request
-                        contactEmail: 'e2fhoildays@gmail.com', // Forced as per request
+                        contactEmail: 'info.e2fhoildays@gmail.com', // Forced as per request
                         socialLinks: data.socialLinks || {},
                         logo: data.logo || LogoImg
                     });
@@ -67,8 +67,8 @@ const Footer = () => {
                     <a href={`https://wa.me/919642810644`} target="_blank" rel="noopener noreferrer" className="font-medium text-white hover:text-[#25D366] transition-colors text-sm flex items-center gap-2">
                         <span>📱 Call/WhatsApp: +91 96428 10644</span>
                     </a>
-                    <a href={`mailto:e2fhoildays@gmail.com`} className="font-medium text-white hover:text-sky-300 transition-colors text-sm">
-                        📩 Email: e2fhoildays@gmail.com
+                    <a href={`mailto:info.e2fhoildays@gmail.com`} className="font-medium text-white hover:text-sky-300 transition-colors text-sm">
+                        📩 Email: info.e2fhoildays@gmail.com
                     </a>
                 </div>
 

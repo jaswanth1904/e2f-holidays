@@ -348,7 +348,7 @@ const PackageDetails = () => {
                             </a>
 
                             <a
-                                href={`mailto:e2fhoildays@gmail.com?subject=Enquiry for ${pkg.title}&body=Hi, I would like to get more details and a quote for the ${pkg.title} package.`}
+                                href={`mailto:info.e2fhoildays@gmail.com?subject=Enquiry for ${pkg.title}&body=Hi, I would like to get more details and a quote for the ${pkg.title} package.`}
                                 className="flex items-center justify-center gap-3 w-full py-3.5 rounded-xl border-2 border-brand-blue text-brand-blue dark:text-blue-400 font-bold text-base hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all group"
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="group-hover:-translate-y-1 transition-transform"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>

@@ -137,7 +137,7 @@ const Features = () => {
                                 💬 WhatsApp Us
                             </a>
                             <a
-                                href="mailto:e2fhoildays@gmail.com"
+                                href="mailto:info.e2fhoildays@gmail.com"
                                 className="flex items-center gap-3 px-8 py-3 rounded-full bg-brand-blue text-white font-bold text-sm hover:bg-brand-dark transition-all shadow-lg shadow-brand-blue/20"
                             >
                                 📩 Send Email
