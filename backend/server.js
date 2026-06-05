@@ -16,7 +16,7 @@ dotenv.config();
 const app = express();
 
 // Security Middlewares
-app.use(helmet()); // Set security HTTP headers
+app.use(helmet({ crossOriginResourcePolicy: false })); // Allow cross-origin API access
 
 // Rate Limiting to prevent brute-force attacks
 const limiter = rateLimit({
