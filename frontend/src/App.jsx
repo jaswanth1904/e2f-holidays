@@ -1,4 +1,5 @@
 import { useState, useEffect, Suspense, lazy } from 'react';
+import { Analytics } from "@vercel/analytics/react";
 import { HelmetProvider } from 'react-helmet-async';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
@@ -141,6 +142,7 @@ function App() {
           </ErrorBoundary>
         </Router>
       </AuthProvider>
+      <Analytics />
     </HelmetProvider>
   );
 }
