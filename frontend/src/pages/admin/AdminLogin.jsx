@@ -1,4 +1,4 @@
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 import { Lock, User, Eye, EyeOff, ShieldCheck, ArrowRight } from 'lucide-react';
@@ -9,8 +9,14 @@ const AdminLogin = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-    const { login } = useContext(AuthContext);
+    const { login, admin, loading } = useContext(AuthContext);
     const navigate = useNavigate();
+
+    useEffect(() => {
+        if (!loading && admin) {
+            navigate('/admin/dashboard', { replace: true });
+        }
+    }, [admin, loading, navigate]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();

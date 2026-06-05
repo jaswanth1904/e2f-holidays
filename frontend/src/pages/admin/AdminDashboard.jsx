@@ -39,7 +39,7 @@ const DashboardContent = () => {
 
     useEffect(() => {
         if (!loading && !admin) {
-            navigate('/admin');
+            navigate('/', { replace: true });
         }
     }, [admin, loading, navigate]);
 
