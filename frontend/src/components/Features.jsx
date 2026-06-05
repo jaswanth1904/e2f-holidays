@@ -97,13 +97,7 @@ const Features = () => {
                                     </div>
                                 </div>
 
-                                <div className="border-t border-gray-100 dark:border-gray-800 pt-4 flex items-center justify-between mt-auto">
-                                    <div>
-                                        <p className="text-[10px] uppercase text-gray-400 font-bold mb-0.5">Starting From</p>
-                                        <p className="text-sm font-bold text-brand-blue dark:text-brand-yellow">
-                                            ₹{pkg.price ? pkg.price.toLocaleString('en-IN') : 'Call Us'}
-                                        </p>
-                                    </div>
+                                <div className="border-t border-gray-100 dark:border-gray-800 pt-4 flex items-center justify-end mt-auto">
                                     <Link
                                         to={`/package/${pkg.id}`}
                                         className="bg-brand-blue text-white px-5 py-2 rounded-full font-medium text-sm hover:bg-brand-dark transition-colors shadow-lg shadow-brand-blue/30 flex items-center gap-2"

@@ -1,7 +1,7 @@
 import { useState, useEffect, Suspense, lazy } from 'react';
 import { Analytics } from "@vercel/analytics/react";
 import { HelmetProvider } from 'react-helmet-async';
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation, useNavigationType } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import Footer from './components/Footer';
@@ -37,14 +37,19 @@ const HomePage = () => (
 
 const ScrollToTop = () => {
   const { pathname, hash } = useLocation();
+  const navType = useNavigationType();
 
   useEffect(() => {
     if ('scrollRestoration' in window.history) {
-      window.history.scrollRestoration = 'manual';
+      window.history.scrollRestoration = 'auto';
     }
   }, []);
 
   useEffect(() => {
+    if (navType === 'POP') {
+        return; // Let the browser handle scroll restoration on back/forward
+    }
+    
     if (!hash) {
       window.scrollTo(0, 0);
       const timer = setTimeout(() => window.scrollTo(0, 0), 0);
@@ -59,7 +64,7 @@ const ScrollToTop = () => {
       }, 50);
       return () => clearTimeout(timer);
     }
-  }, [pathname, hash]);
+  }, [pathname, hash, navType]);
 
   return null;
 };
