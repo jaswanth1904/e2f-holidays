@@ -26,11 +26,24 @@ const limiter = rateLimit({
 });
 app.use('/api', limiter);
 
-// CORS configuration (allow frontend only in prod)
+// CORS configuration
 app.use(cors({
-    origin: process.env.NODE_ENV === 'production' 
-        ? ['https://e2fholidays.com', 'https://www.e2fholidays.com', 'https://e2f-holidays.vercel.app'] 
-        : ['http://localhost:5173', 'http://127.0.0.1:5173', 'http://localhost:5174', 'http://127.0.0.1:5174', 'https://e2f-holidays.vercel.app'],
+    origin: function (origin, callback) {
+        if (!origin) return callback(null, true);
+        const allowedOrigins = [
+            'https://e2fholidays.com', 
+            'https://www.e2fholidays.com', 
+            'http://localhost:5173', 
+            'http://127.0.0.1:5173', 
+            'http://localhost:5174', 
+            'http://127.0.0.1:5174'
+        ];
+        if (allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
     credentials: true
 }));
 
