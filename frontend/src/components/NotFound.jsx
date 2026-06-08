@@ -1,9 +1,12 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { MapPin, Compass } from 'lucide-react';
+import SEO from './SEO';
 
 const NotFound = () => {
     return (
+        <>
+        <SEO title="Page Not Found - E2F Holidays" description="The page you are looking for does not exist." />
         <section className="min-h-[80vh] flex flex-col items-center justify-center text-center px-4 relative overflow-hidden bg-white dark:bg-black transition-colors duration-500">
             {/* Background Decorations */}
             <div className="absolute inset-0 pointer-events-none opacity-10 dark:opacity-20">
@@ -44,6 +47,7 @@ const NotFound = () => {
                 </Link>
             </motion.div>
         </section>
+        </>
     );
 };
 

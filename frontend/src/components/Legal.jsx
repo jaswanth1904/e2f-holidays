@@ -1,8 +1,14 @@
 import { motion } from 'framer-motion';
 import { ShieldCheck, AlertCircle, FileText, Lock } from 'lucide-react';
+import SEO from './SEO';
 
 const Legal = () => {
     return (
+        <>
+        <SEO 
+            title="Privacy & Terms - E2F Holidays"
+            description="Read the privacy policy, terms of service, and refund policies for E2F Holidays."
+        />
         <div className="pt-32 pb-24 bg-gray-50 dark:bg-black min-h-screen">
             <div className="max-w-4xl mx-auto px-6">
                 <motion.div
@@ -96,6 +102,7 @@ const Legal = () => {
                 </motion.div>
             </div>
         </div>
+        </>
     );
 };
 

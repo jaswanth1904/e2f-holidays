@@ -19,15 +19,21 @@ const PackageDetails = lazy(() => import('./components/PackageDetails'));
 const Legal = lazy(() => import('./components/Legal'));
 const NotFound = lazy(() => import('./components/NotFound'));
 
-// Loading fallback component
 const PageLoader = () => (
   <div className="w-full h-16 flex items-center justify-center">
     <div className="w-6 h-6 border-2 border-brand-blue border-t-transparent rounded-full animate-spin"></div>
   </div>
 );
 
+import SEO from './components/SEO';
+
 const HomePage = () => (
   <>
+    <SEO 
+        title="E2F Holidays | Discover Your Dream Destination"
+        description="Explore the world with E2F Holidays. Luxury cruises, domestic tours, international packages, and custom itineraries."
+        type="website"
+    />
     <Hero />
     <Suspense fallback={<PageLoader />}>
       <BelowTheFold />

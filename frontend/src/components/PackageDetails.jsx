@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { MapPin, Calendar as CalendarIcon, Anchor, CheckCircle, XCircle, Info, ArrowLeft, ChevronDown, ChevronUp, Hotel, Car, Utensils, Camera, Clock } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { Helmet } from 'react-helmet-async';
+import SEO from './SEO';
 
 const PackageDetails = () => {
     const { id } = useParams();
@@ -89,32 +89,26 @@ const PackageDetails = () => {
 
     return (
         <>
-            <Helmet>
-                <title>{`${pkg.title} - E2F Holidays`}</title>
-                <meta name="description" content={pkg.description} />
-                <meta property="og:title" content={`${pkg.title} - E2F Holidays`} />
-                <meta property="og:description" content={pkg.description} />
-                <meta property="og:image" content={pkg.image} />
-                <script type="application/ld+json">
-                    {`
-                        {
-                            "@context": "https://schema.org",
-                            "@type": "TouristTrip",
-                            "name": "${pkg.title}",
-                            "description": "${pkg.description}",
-                            "provider": {
-                                "@type": "TravelAgency",
-                                "name": "E2F Holidays"
-                            },
-                            "offers": {
-                                "@type": "Offer",
-                                "price": "${pkg.price || 0}",
-                                "priceCurrency": "INR"
-                            }
-                        }
-                    `}
-                </script>
-            </Helmet>
+            <SEO 
+                title={`${pkg.title} - E2F Holidays`}
+                description={pkg.description}
+                type="article"
+                schema={{
+                    "@context": "https://schema.org",
+                    "@type": "TouristTrip",
+                    "name": pkg.title,
+                    "description": pkg.description,
+                    "provider": {
+                        "@type": "TravelAgency",
+                        "name": "E2F Holidays"
+                    },
+                    "offers": {
+                        "@type": "Offer",
+                        "price": pkg.price || 0,
+                        "priceCurrency": "INR"
+                    }
+                }}
+            />
             <div className="min-h-screen bg-[#F5F7FA] dark:bg-black text-gray-900 dark:text-white pb-20 font-sans pt-16 md:pt-20">
                 {/* Hero Section */}
             <div className="relative h-[300px] md:h-[450px] w-full">
