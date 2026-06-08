@@ -28,13 +28,35 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    const updateCredentials = async (newUsername, currentPassword, newPassword) => {
+        try {
+            const config = { 
+                headers: { 
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${admin.token}`
+                } 
+            };
+            const { data } = await axios.put(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/auth/update`, { 
+                newUsername, 
+                currentPassword, 
+                newPassword 
+            }, config);
+            setAdmin(data);
+            localStorage.setItem('adminInfo', JSON.stringify(data));
+            return { success: true };
+        } catch (error) {
+            console.error("Backend Error:", error);
+            return { success: false, message: error.response?.data?.message || 'Update failed' };
+        }
+    };
+
     const logout = () => {
         setAdmin(null);
         localStorage.removeItem('adminInfo');
     };
 
     return (
-        <AuthContext.Provider value={{ admin, login, logout, loading }}>
+        <AuthContext.Provider value={{ admin, login, logout, updateCredentials, loading }}>
             {children}
         </AuthContext.Provider>
     );
