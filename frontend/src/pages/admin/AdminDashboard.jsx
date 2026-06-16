@@ -16,7 +16,7 @@ import {
     Clock,
     Heart
 } from 'lucide-react';
-import { ToastProvider } from '../../components/ui/ToastProvider';
+import { ToastProvider, useToast } from '../../components/ui/ToastProvider';
 import LogoImg from '../../assets/E2F Holidays Logo.png';
 
 // Import Tabs
@@ -36,6 +36,7 @@ const DashboardContent = () => {
     const [activeTab, setActiveTab] = useState('analytics');
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [currentTime, setCurrentTime] = useState(new Date());
+    const { addToast } = useToast();
 
     useEffect(() => {
         if (!loading && !admin) {
@@ -47,6 +48,18 @@ const DashboardContent = () => {
         const timer = setInterval(() => setCurrentTime(new Date()), 1000);
         return () => clearInterval(timer);
     }, []);
+
+    useEffect(() => {
+        if (admin) {
+            import('../../socket').then(({ socket }) => {
+                const onNewEnquiry = (enquiry) => {
+                    addToast(`New Enquiry from ${enquiry.firstName}!`, 'success');
+                };
+                socket.on('new_enquiry', onNewEnquiry);
+                return () => socket.off('new_enquiry', onNewEnquiry);
+            });
+        }
+    }, [admin, addToast]);
 
     const dailyMessages = [
         "Hope you have a fantastic day!",

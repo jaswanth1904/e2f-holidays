@@ -10,6 +10,7 @@ import ImagePreloader from './utils/ImagePreloader';
 import { AuthProvider } from './context/AuthContext';
 import AdminLogin from './pages/admin/AdminLogin';
 import AdminDashboard from './pages/admin/AdminDashboard';
+import { socket } from './socket';
 
 // Performance optimization: Group sections into "Below the Fold" chunks
 const BelowTheFold = lazy(() => import('./components/MainSections'));

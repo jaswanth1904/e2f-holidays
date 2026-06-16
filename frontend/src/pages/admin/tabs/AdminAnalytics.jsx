@@ -38,32 +38,26 @@ const StatCard = ({ title, value, icon: Icon, trend, trendLabel, colorClass = "t
 
 const AdminAnalytics = () => {
     const [stats, setStats] = useState({ packages: 0, testimonials: 0, services: 0 });
-    const [activeVisitors, setActiveVisitors] = useState(142);
-
-    useEffect(() => {
-        // Mock real-time visitor fluctuation
-        const interval = setInterval(() => {
-            setActiveVisitors(prev => {
-                const change = Math.floor(Math.random() * 5) - 2; // -2 to +2
-                return Math.max(10, prev + change);
-            });
-        }, 3000);
-        return () => clearInterval(interval);
-    }, []);
+    const [activeVisitors, setActiveVisitors] = useState(0);
+    const [recentInquiries, setRecentInquiries] = useState([]);
 
     useEffect(() => {
         const fetchStats = async () => {
             try {
-                const [pkgRes, testRes, srvRes] = await Promise.all([
+                const [pkgRes, testRes, srvRes, inqRes] = await Promise.all([
                     axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/packages`).catch(() => ({ data: [] })),
                     axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/testimonials`).catch(() => ({ data: [] })),
-                    axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/features`).catch(() => ({ data: [] }))
+                    axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/features`).catch(() => ({ data: [] })),
+                    axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/enquiries`, { withCredentials: true }).catch(() => ({ data: [] }))
                 ]);
                 setStats({
                     packages: pkgRes.data.length,
                     testimonials: testRes.data.length,
                     services: srvRes.data.length
                 });
+                if (inqRes.data && Array.isArray(inqRes.data)) {
+                    setRecentInquiries(inqRes.data.slice(0, 10)); // Top 10 recent
+                }
             } catch (error) {
                 console.error("Failed to fetch stats", error);
             }
@@ -71,7 +65,25 @@ const AdminAnalytics = () => {
         fetchStats();
     }, []);
 
-    // Mock data for Recharts
+    useEffect(() => {
+        import('../../../socket').then(({ socket }) => {
+            const onVisitorUpdate = (count) => setActiveVisitors(count);
+            const onNewEnquiry = (enquiry) => {
+                setRecentInquiries(prev => [enquiry, ...prev].slice(0, 10));
+                // We could also show a toast here if ToastProvider is available, but the global AdminDashboard might be better
+            };
+
+            socket.on('visitor_count_updated', onVisitorUpdate);
+            socket.on('new_enquiry', onNewEnquiry);
+
+            return () => {
+                socket.off('visitor_count_updated', onVisitorUpdate);
+                socket.off('new_enquiry', onNewEnquiry);
+            };
+        });
+    }, []);
+
+    // Mock data for Recharts (Could be replaced with real data later)
     const chartData = [
         { name: 'Jan', views: 4000, inquiries: 240 },
         { name: 'Feb', views: 3000, inquiries: 139 },
@@ -87,12 +99,6 @@ const AdminAnalytics = () => {
         { name: 'South India', value: 25 },
     ];
     const COLORS = ['#2B4560', '#3B82F6', '#10B981'];
-
-    const recentInquiries = [
-        { id: 1, name: 'Alice Smith', package: 'Bali Paradise', date: '2 hours ago', status: 'New' },
-        { id: 2, name: 'John Doe', package: 'European Tour', date: '5 hours ago', status: 'Contacted' },
-        { id: 3, name: 'Emma Wilson', package: 'Maldives Getaway', date: '1 day ago', status: 'Closed' },
-    ];
 
     return (
         <div className="space-y-8 animate-in fade-in duration-300">
@@ -206,31 +212,35 @@ const AdminAnalytics = () => {
                     <button className="text-sm text-blue-600 hover:text-blue-700 font-medium bg-blue-50 dark:bg-blue-900/30 px-3 py-1.5 rounded-lg">View All Leads</button>
                 </div>
                 <div className="divide-y divide-gray-100 dark:divide-gray-700">
-                    {recentInquiries.map((inquiry) => (
-                        <div key={inquiry.id} className="p-4 sm:px-6 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors flex items-center justify-between">
-                            <div className="flex items-center gap-4">
-                                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900/50 dark:to-blue-800/50 flex items-center justify-center text-blue-700 dark:text-blue-300 font-bold border border-blue-200 dark:border-blue-800">
-                                    {inquiry.name.charAt(0)}
+                    {recentInquiries.length === 0 ? (
+                        <div className="p-6 text-center text-gray-500">No recent inquiries found.</div>
+                    ) : (
+                        recentInquiries.map((inquiry) => (
+                            <div key={inquiry._id || inquiry.id} className="p-4 sm:px-6 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors flex items-center justify-between">
+                                <div className="flex items-center gap-4">
+                                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900/50 dark:to-blue-800/50 flex items-center justify-center text-blue-700 dark:text-blue-300 font-bold border border-blue-200 dark:border-blue-800">
+                                        {(inquiry.firstName || inquiry.name || 'U').charAt(0)}
+                                    </div>
+                                    <div>
+                                        <p className="font-semibold text-gray-900 dark:text-white">{inquiry.firstName} {inquiry.lastName}</p>
+                                        <p className="text-sm text-gray-500 flex items-center gap-1 mt-0.5">
+                                            <MapPin size={12} className="text-[#2B4560] dark:text-blue-400" /> {inquiry.destination}
+                                        </p>
+                                    </div>
                                 </div>
-                                <div>
-                                    <p className="font-semibold text-gray-900 dark:text-white">{inquiry.name}</p>
-                                    <p className="text-sm text-gray-500 flex items-center gap-1 mt-0.5">
-                                        <MapPin size={12} className="text-[#2B4560] dark:text-blue-400" /> {inquiry.package}
-                                    </p>
+                                <div className="text-right">
+                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border ${
+                                        inquiry.status === 'New' ? 'bg-green-50 text-green-700 border-green-200 dark:bg-green-900/30 dark:border-green-800 dark:text-green-400' :
+                                        inquiry.status === 'Contacted' ? 'bg-yellow-50 text-yellow-700 border-yellow-200 dark:bg-yellow-900/30 dark:border-yellow-800 dark:text-yellow-400' :
+                                        'bg-gray-50 text-gray-700 border-gray-200 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300'
+                                    }`}>
+                                        {inquiry.status || 'New'}
+                                    </span>
+                                    <p className="text-xs text-gray-400 mt-1.5">{new Date(inquiry.createdAt || new Date()).toLocaleDateString()}</p>
                                 </div>
                             </div>
-                            <div className="text-right">
-                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border ${
-                                    inquiry.status === 'New' ? 'bg-green-50 text-green-700 border-green-200 dark:bg-green-900/30 dark:border-green-800 dark:text-green-400' :
-                                    inquiry.status === 'Contacted' ? 'bg-yellow-50 text-yellow-700 border-yellow-200 dark:bg-yellow-900/30 dark:border-yellow-800 dark:text-yellow-400' :
-                                    'bg-gray-50 text-gray-700 border-gray-200 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300'
-                                }`}>
-                                    {inquiry.status}
-                                </span>
-                                <p className="text-xs text-gray-400 mt-1.5">{inquiry.date}</p>
-                            </div>
-                        </div>
-                    ))}
+                        ))
+                    )}
                 </div>
             </div>
         </div>

@@ -1,8 +1,37 @@
-import { useRef } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Mail, Phone, MapPin } from 'lucide-react';
+import axios from 'axios';
 
 const Contact = () => {
+    const [formData, setFormData] = useState({
+        firstName: '',
+        lastName: '',
+        email: '',
+        destination: '',
+        message: ''
+    });
+    const [status, setStatus] = useState(null);
+
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setStatus('submitting');
+        try {
+            await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/enquiries`, formData);
+            setStatus('success');
+            setFormData({ firstName: '', lastName: '', email: '', destination: '', message: '' });
+            setTimeout(() => setStatus(null), 5000);
+        } catch (error) {
+            console.error('Error submitting enquiry:', error);
+            setStatus('error');
+            setTimeout(() => setStatus(null), 5000);
+        }
+    };
+
     return (
         <section id="contact" className="py-24 px-6 md:px-12 bg-gray-50 dark:bg-zinc-900 transition-colors duration-500">
             <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 md:gap-24">
@@ -76,40 +105,45 @@ const Contact = () => {
                     {/* Subtle decorative circle */}
                     <div className="absolute top-0 right-0 w-64 h-64 bg-brand-blue/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
 
-                    <form className="relative z-10 space-y-6">
+                    <form onSubmit={handleSubmit} className="relative z-10 space-y-6">
+                        {status === 'success' && (
+                            <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative">
+                                Thank you! Your enquiry has been sent successfully. We will contact you soon.
+                            </div>
+                        )}
+                        {status === 'error' && (
+                            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
+                                Error submitting form. Please try again or email us directly.
+                            </div>
+                        )}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="space-y-2">
                                 <label className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 ml-1">First Name</label>
-                                <input type="text" placeholder="John" className="w-full bg-gray-50 dark:bg-zinc-900 border border-transparent focus:border-brand-blue focus:bg-white dark:focus:bg-black rounded-xl px-4 py-3 outline-none transition-all placeholder:text-gray-400 text-gray-900 dark:text-white" />
+                                <input required type="text" name="firstName" value={formData.firstName} onChange={handleChange} placeholder="John" className="w-full bg-gray-50 dark:bg-zinc-900 border border-transparent focus:border-brand-blue focus:bg-white dark:focus:bg-black rounded-xl px-4 py-3 outline-none transition-all placeholder:text-gray-400 text-gray-900 dark:text-white" />
                             </div>
                             <div className="space-y-2">
                                 <label className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 ml-1">Last Name</label>
-                                <input type="text" placeholder="Doe" className="w-full bg-gray-50 dark:bg-zinc-900 border border-transparent focus:border-brand-blue focus:bg-white dark:focus:bg-black rounded-xl px-4 py-3 outline-none transition-all placeholder:text-gray-400 text-gray-900 dark:text-white" />
+                                <input required type="text" name="lastName" value={formData.lastName} onChange={handleChange} placeholder="Doe" className="w-full bg-gray-50 dark:bg-zinc-900 border border-transparent focus:border-brand-blue focus:bg-white dark:focus:bg-black rounded-xl px-4 py-3 outline-none transition-all placeholder:text-gray-400 text-gray-900 dark:text-white" />
                             </div>
                         </div>
 
                         <div className="space-y-2">
                             <label className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 ml-1">Email Address</label>
-                            <input
-                                type="email"
-                                value="info.e2fhoildays@gmail.com"
-                                readOnly
-                                className="w-full bg-gray-200 dark:bg-zinc-800 border border-transparent rounded-xl px-4 py-3 outline-none transition-all text-gray-600 dark:text-gray-400 cursor-not-allowed select-none"
-                            />
+                            <input required type="email" name="email" value={formData.email} onChange={handleChange} placeholder="john@example.com" className="w-full bg-gray-50 dark:bg-zinc-900 border border-transparent focus:border-brand-blue focus:bg-white dark:focus:bg-black rounded-xl px-4 py-3 outline-none transition-all placeholder:text-gray-400 text-gray-900 dark:text-white" />
                         </div>
 
                         <div className="space-y-2">
                             <label className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 ml-1">Destination Interest</label>
-                            <input type="text" placeholder="Name your dream destination" className="w-full bg-gray-50 dark:bg-zinc-900 border border-transparent focus:border-brand-blue focus:bg-white dark:focus:bg-black rounded-xl px-4 py-3 outline-none transition-all placeholder:text-gray-400 text-gray-900 dark:text-white" />
+                            <input required type="text" name="destination" value={formData.destination} onChange={handleChange} placeholder="Name your dream destination" className="w-full bg-gray-50 dark:bg-zinc-900 border border-transparent focus:border-brand-blue focus:bg-white dark:focus:bg-black rounded-xl px-4 py-3 outline-none transition-all placeholder:text-gray-400 text-gray-900 dark:text-white" />
                         </div>
 
                         <div className="space-y-2">
                             <label className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 ml-1">Message</label>
-                            <textarea rows="4" placeholder="Tell us about your dream trip..." className="w-full bg-gray-50 dark:bg-zinc-900 border border-transparent focus:border-brand-blue focus:bg-white dark:focus:bg-black rounded-xl px-4 py-3 outline-none transition-all placeholder:text-gray-400 text-gray-900 dark:text-white resize-none"></textarea>
+                            <textarea required name="message" value={formData.message} onChange={handleChange} rows="4" placeholder="Tell us about your dream trip..." className="w-full bg-gray-50 dark:bg-zinc-900 border border-transparent focus:border-brand-blue focus:bg-white dark:focus:bg-black rounded-xl px-4 py-3 outline-none transition-all placeholder:text-gray-400 text-gray-900 dark:text-white resize-none"></textarea>
                         </div>
 
-                        <button type="submit" className="w-full bg-brand-blue text-white font-bold text-lg py-4 rounded-xl hover:bg-brand-dark hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg hover:shadow-xl mt-4">
-                            Send Message
+                        <button disabled={status === 'submitting'} type="submit" className="w-full bg-brand-blue text-white font-bold text-lg py-4 rounded-xl hover:bg-brand-dark hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg hover:shadow-xl mt-4 disabled:opacity-70">
+                            {status === 'submitting' ? 'Sending...' : 'Send Message'}
                         </button>
                     </form>
                 </motion.div>
