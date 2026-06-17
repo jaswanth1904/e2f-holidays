@@ -289,7 +289,7 @@ const CustomerReviews = () => {
     };
 
     return (
-        <section id="testimonials" className="py-24 px-4 bg-gray-50 dark:bg-black overflow-hidden relative transition-colors duration-500">
+        <section id="client-reviews" className="py-24 px-4 bg-gray-50 dark:bg-black overflow-hidden relative transition-colors duration-500">
             {/* Background Image with Overlay */}
             <div className="absolute inset-0 z-0 pointer-events-none">
                 <img

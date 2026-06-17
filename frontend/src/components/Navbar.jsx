@@ -54,7 +54,7 @@ const Navbar = ({ toggleDarkMode, isDarkMode }) => {
 
                     {/* 2. Center: Navigation Links (Hidden on Mobile) */}
                     <div className="hidden lg:flex items-center gap-4 xl:gap-8 justify-center">
-                        {['About', 'Services', 'Testimonials', 'Blog', 'Contact'].map((item) => (
+                        {['About', 'Services', 'Client Reviews', 'Blog', 'Contact'].map((item) => (
                             <Link
                                 key={item}
                                 to={`/#${item.toLowerCase().replace(' ', '-')}`}
@@ -106,7 +106,7 @@ const Navbar = ({ toggleDarkMode, isDarkMode }) => {
                         className="fixed inset-0 z-40 bg-white dark:bg-black pt-24 px-8 lg:hidden flex flex-col items-center"
                     >
                         <nav className="flex flex-col gap-8 text-center w-full">
-                            {['About', 'Services', 'Testimonials', 'Blog', 'Contact'].map((item) => (
+                            {['About', 'Services', 'Client Reviews', 'Blog', 'Contact'].map((item) => (
                                 <Link
                                     key={item}
                                     to={`/#${item.toLowerCase().replace(' ', '-')}`}
