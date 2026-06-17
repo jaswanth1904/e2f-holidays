@@ -302,12 +302,12 @@ const CustomerReviews = () => {
             </div>
 
             <div className="max-w-7xl mx-auto relative z-10">
-                <div className="text-center mb-20">
-                    <span className="text-brand-teal dark:text-brand-yellow font-bold tracking-widest uppercase text-xs mb-3 block">
-                        Client Stories
+                <div className="text-center mb-16">
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-blue via-brand-teal to-brand-yellow font-black tracking-widest uppercase text-sm mb-3 block">
+                        Client Reviews
                     </span>
                     <h2 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white font-display">
-                        What Our <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-red to-brand-yellow">Travelers Say</span>
+                        What Our <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-red via-brand-yellow to-brand-teal">Clients Say</span>
                     </h2>
                 </div>
 
@@ -336,6 +336,46 @@ const CustomerReviews = () => {
                     {/* Right Column: Feedback Form */}
                     <div>
                         <FeedbackForm onAddReview={addReview} />
+                    </div>
+                </div>
+
+                {/* Call to Action for Booking */}
+                <div className="mt-20 text-center bg-gradient-to-r from-brand-blue/10 via-brand-teal/10 to-brand-yellow/10 dark:from-brand-blue/20 dark:via-brand-teal/20 dark:to-brand-yellow/20 rounded-3xl p-10 border border-brand-teal/20 backdrop-blur-sm relative overflow-hidden">
+                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-brand-blue via-brand-teal to-brand-yellow"></div>
+                    <h3 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Ready to Book a Trip With Us?</h3>
+                    <p className="text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto text-lg">
+                        Join hundreds of happy clients and let us plan your perfect getaway. Your dream vacation is just a click away!
+                    </p>
+                    <a href="#contact" className="inline-block px-10 py-4 bg-gradient-to-r from-brand-red to-brand-yellow hover:from-brand-yellow hover:to-brand-red text-white font-black text-lg rounded-full shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all">
+                        Plan My Trip Now
+                    </a>
+                </div>
+
+                {/* Live Google Reviews Widget Placeholder (Option 2) */}
+                <div className="mt-12 bg-white dark:bg-zinc-900 rounded-3xl p-8 border border-gray-100 dark:border-gray-800 shadow-xl text-center">
+                    <h3 className="text-2xl font-bold mb-6 flex items-center justify-center gap-2">
+                        <span className="text-blue-500">G</span>
+                        <span className="text-red-500">o</span>
+                        <span className="text-yellow-500">o</span>
+                        <span className="text-blue-500">g</span>
+                        <span className="text-green-500">l</span>
+                        <span className="text-red-500">e</span>
+                        <span className="text-gray-900 dark:text-white ml-2">Reviews</span>
+                    </h3>
+                    
+                    {/* Widget Code Goes Here */}
+                    <div className="min-h-[150px] border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-xl flex flex-col items-center justify-center p-6 mb-6">
+                        <p className="text-gray-500 mb-2">Google Reviews Widget will automatically appear here</p>
+                        <p className="text-sm text-gray-400">Once you create an Elfsight widget, paste the code here</p>
+                    </div>
+
+                    <div className="flex flex-wrap justify-center gap-4">
+                        <a href="#" target="_blank" rel="noopener noreferrer" className="px-6 py-3 bg-white dark:bg-zinc-800 border border-gray-200 dark:border-gray-700 rounded-full font-bold shadow-sm hover:shadow-md transition-all flex items-center gap-2">
+                            ⭐️ Read our reviews on Google
+                        </a>
+                        <a href="#" target="_blank" rel="noopener noreferrer" className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-full font-bold shadow-sm hover:shadow-md transition-all flex items-center gap-2">
+                            ✍️ Leave us a Google Review
+                        </a>
                     </div>
                 </div>
             </div>
